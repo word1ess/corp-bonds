@@ -1,0 +1,25 @@
+.socials {
+    display: flex;
+    gap: 16px;
+
+    a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px 14px;
+        background: #eff2f6;
+        border-radius: 16px;
+        transition: all 300ms ease;
+        &:hover {
+            background: #3ab54a;
+
+            path {
+                fill: #fff;
+            }
+        }
+        path {
+            transition: all 300ms ease;
+            fill: #01b6ef;
+        }
+    }
+}

@@ -1,24 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import Footer from "./Components/Footer/Footer";
+import Header from "./Components/Header/Header";
+
+import { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 
 function App() {
+  const checkIsMobile = (width) => {
+    return width < 992 ? true : false;
+  };
+  const [isMobile, setisMobile] = useState(checkIsMobile(window.innerWidth));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setisMobile(checkIsMobile(window.innerWidth));
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header isMobile={isMobile} />
+      <main className="content">
+        <Outlet context={isMobile} />
+      </main>
+      <Footer isMobile={isMobile} />
+    </>
   );
 }
 
