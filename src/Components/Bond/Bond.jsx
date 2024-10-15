@@ -18,15 +18,11 @@ export default function Bond() {
 
   return (
     <section className="bond">
-      <BondHeader
-        bondHeader={bondData.bondHeader}
-        linkImg={linkImg}
-        isMobile={isMobile}
-      />
-      <BondInfo bondInfoItems={bondData.bondInfo} linkImg={linkImg} />
+      <BondHeader bondHeader={bondData.bondHeader} isMobile={isMobile} />
+      <BondInfo bondInfoItems={bondData.bondInfo} />
       <BondTables bondTables={bondData.bondTables} isMobile={isMobile} />
       <BondChart isMobile={isMobile} />
-      <BondLinks bondLinks={bondData.bondLinks} linkImg={linkImg} />
+      <BondLinks bondLinks={bondData.bondLinks} />
     </section>
   );
 }

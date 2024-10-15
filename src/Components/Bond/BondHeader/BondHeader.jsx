@@ -1,16 +1,15 @@
 import bondImg from "./img/1.png";
 
-import { Link } from "react-router-dom";
-import { Tooltip } from "react-tooltip";
-
 import BondCard from "./BondCard";
+import CustomTooltip from "../../Common/CustomTooltip/CustomTooltip";
+import CustomLinkArrow from "../../Common/LinkWithArrow/LinkWithArrow";
 
-export default function BondHeader({ bondHeader, linkImg, isMobile }) {
+export default function BondHeader({ bondHeader, isMobile }) {
   const liquiditySteps = Array(5)
     .fill(false)
     .fill(true, 0, bondHeader.liquidity.stage);
 
-  function BondBigCardHeader({ bondHeader }) {
+  function BondBigCardHeader({ bondHeader, isMobile }) {
     if (isMobile) {
       return (
         <>
@@ -23,10 +22,11 @@ export default function BondHeader({ bondHeader, linkImg, isMobile }) {
               <h2>{bondHeader.code}</h2>
               <div className="bond-big-card__emitent">
                 <p>Эмитент:</p>
-                <Link to={bondHeader.emitent.link}>
-                  {bondHeader.emitent.text}
-                </Link>
-                <img src={linkImg} alt="linkImg" />
+
+                <CustomLinkArrow
+                  text={bondHeader.emitent.text}
+                  link={bondHeader.emitent.link}
+                />
               </div>
             </div>
           </header>
@@ -54,8 +54,11 @@ export default function BondHeader({ bondHeader, linkImg, isMobile }) {
           <h2>{bondHeader.code}</h2>
           <div className="bond-big-card__emitent">
             <p>Эмитент:</p>
-            <Link to={bondHeader.emitent.link}>{bondHeader.emitent.text}</Link>
-            <img src={linkImg} alt="linkImg" />
+
+            <CustomLinkArrow
+              text={bondHeader.emitent.text}
+              link={bondHeader.emitent.link}
+            />
           </div>
           <div className="bond-big-card__liquidity">
             <p>Ликвидность:</p>
@@ -66,23 +69,15 @@ export default function BondHeader({ bondHeader, linkImg, isMobile }) {
                 );
               })}
             </div>
-            <a
-              href="#"
-              className="liquidity tooltip"
-              data-tooltip-id="liquidity"
-              data-tooltip-content="Yorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis."
-            >
-              ?
-            </a>
-            <Tooltip anchorSelect=".liquidity" place="top" />
+            <CustomTooltip parent="liquidity" place="top" />
             <p>{bondHeader.liquidity.moneyInDay}</p>
           </div>
         </div>
       </header>
     );
   }
-  function BondBigCardFooter() {
-    if (isMobile) {
+  function BondBigCardFooter({ isRerender }) {
+    if (isRerender) {
       return (
         <>
           <footer className="bond-big-card__footer">
@@ -181,33 +176,7 @@ export default function BondHeader({ bondHeader, linkImg, isMobile }) {
               </svg>
             </button>
           </footer>
-          <Link to="#" className="bond-big-card__review">
-            Обзоры эмитента от CorpBonds
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18.0699 14.4302L11.9999 20.5002L5.92993 14.4302"
-                stroke="#3A65B5"
-                stroke-width="1.5"
-                stroke-miterlimit="10"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M12 3.5V20.33"
-                stroke="#3A65B5"
-                stroke-width="1.5"
-                stroke-miterlimit="10"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </Link>
+          <CustomLinkArrow text="Обзоры эмитента от CorpBonds" type="bottom" />
         </>
       );
     }
@@ -260,33 +229,8 @@ export default function BondHeader({ bondHeader, linkImg, isMobile }) {
           </svg>
           Добавить в портфель
         </button>
-        <Link to="#" className="bond-big-card__review">
-          Обзоры эмитента от CorpBonds
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18.0699 14.4302L11.9999 20.5002L5.92993 14.4302"
-              stroke="#3A65B5"
-              stroke-width="1.5"
-              stroke-miterlimit="10"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M12 3.5V20.33"
-              stroke="#3A65B5"
-              stroke-width="1.5"
-              stroke-miterlimit="10"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </Link>
+
+        <CustomLinkArrow text="Обзоры эмитента от CorpBonds" type="bottom" />
         <button className="bond-big-card__favorite">
           <svg
             width="22"
@@ -341,8 +285,10 @@ export default function BondHeader({ bondHeader, linkImg, isMobile }) {
   return (
     <header className="bond-header">
       <section className="bond-big-card">
-        <BondBigCardHeader bondHeader={bondHeader} />
-        <BondBigCardFooter />
+        <BondBigCardHeader bondHeader={bondHeader} isMobile={isMobile} />
+        <BondBigCardFooter
+          isRerender={window.screen.width < 1600 ? true : false}
+        />
       </section>
       <main className="bond-cards">
         <BondCard title="YTM" body={bondHeader.ytm} />

@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import CustomTooltip from "../../Common/CustomTooltip/CustomTooltip";
+import CustomLinkArrow from "../../Common/LinkWithArrow/LinkWithArrow";
 
 export default function BondInfoItem({ title, body, links = null, linkImg }) {
   function TableRowItem({ bodyArr }) {
@@ -11,12 +12,26 @@ export default function BondInfoItem({ title, body, links = null, linkImg }) {
     );
   }
   function TableDataItem({ bodyItem }) {
+    console.log(Object.keys(bodyItem));
+
     if (Array.isArray(bodyItem)) {
       return (
         <td>
           {bodyItem.map((item) => {
             return <p>{item}</p>;
           })}
+        </td>
+      );
+    }
+    if (typeof bodyItem === "object") {
+      return (
+        <td>
+          <p>{bodyItem.text}</p>
+          <CustomTooltip
+            parent={bodyItem?.parent}
+            textTooltip={bodyItem.textTooltip}
+            place={bodyItem.place}
+          />
         </td>
       );
     }
@@ -29,11 +44,7 @@ export default function BondInfoItem({ title, body, links = null, linkImg }) {
     return (
       <div className="bond-info__links">
         {links.map((link) => {
-          return (
-            <Link to={link.link}>
-              {link.text} <img src={linkImg} alt="" />
-            </Link>
-          );
+          return <CustomLinkArrow text={link.text} link={link.link} />;
         })}
       </div>
     );

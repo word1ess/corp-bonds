@@ -1,4 +1,4 @@
-import BondInfoItem from "../BondInfoItem/BondInfoItem";
+import BondInfoItem from ".//BondInfoItem";
 
 export default function BondInfo({ bondInfoItems, linkImg }) {
   return (

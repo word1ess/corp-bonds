@@ -65,7 +65,7 @@ export default function Header({
         <MenuNav />
         <Link to="/" className="nav-menu__tg">
           <img src={tg} alt="tg" />
-          телеграм-канал
+          <p>телеграм-канал</p>
         </Link>
         <form action="#" className="nav-menu__form">
           <input type="search" placeholder="Поиск..." />
