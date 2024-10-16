@@ -12,13 +12,11 @@ export default function BondInfoItem({ title, body, links = null, linkImg }) {
     );
   }
   function TableDataItem({ bodyItem }) {
-    console.log(Object.keys(bodyItem));
-
     if (Array.isArray(bodyItem)) {
       return (
         <td>
           {bodyItem.map((item) => {
-            return <p>{item}</p>;
+            return <TableDataInner innerText={item} />;
           })}
         </td>
       );
@@ -26,7 +24,7 @@ export default function BondInfoItem({ title, body, links = null, linkImg }) {
     if (typeof bodyItem === "object") {
       return (
         <td>
-          <p>{bodyItem.text}</p>
+          <TableDataInner innerText={bodyItem.text} />
           <CustomTooltip
             parent={bodyItem?.parent}
             textTooltip={bodyItem.textTooltip}
@@ -35,7 +33,17 @@ export default function BondInfoItem({ title, body, links = null, linkImg }) {
         </td>
       );
     }
-    return <td>{bodyItem}</td>;
+    return (
+      <td>
+        <TableDataInner innerText={bodyItem} />
+      </td>
+    );
+  }
+  function TableDataInner({ innerText }) {
+    if (typeof innerText === "number") {
+      return <p className={innerText < 0 ? "red" : "green"}>{innerText}%</p>;
+    }
+    return <p>{innerText}</p>;
   }
   function Links({ links }) {
     if (!Array.isArray(links)) {

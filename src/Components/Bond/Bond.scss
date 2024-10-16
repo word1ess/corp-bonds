@@ -1,35 +1,38 @@
+@function rem($px) {
+    @return ($px / 14px) + rem;
+}
 .bond {
     h2 {
         font-weight: 700;
-        font-size: 24px;
+        font-size: rem(24px);
         letter-spacing: -0.01em;
         color: #121213;
-        margin-bottom: 32px;
+        margin-bottom: rem(32px);
     }
 }
 .bond-header {
     display: flex;
     width: 100%;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: rem(16px);
+    margin-bottom: rem(16px);
 }
 .bond-cards {
     flex: 1 0 5rem;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: rem(16px);
 }
 .bond-card {
-    padding: 24px;
+    padding: rem(24px);
     border: 1px solid rgba(58, 181, 74, 0.2);
     border-radius: 24px;
     background: #fff;
     h3 {
         font-weight: 400;
-        font-size: 16px;
+        font-size: rem(16px);
         letter-spacing: -0.01em;
         color: #647383;
-        margin-bottom: 8px;
+        margin-bottom: rem(8px);
     }
     .text-with-date {
         display: flex;
@@ -38,14 +41,14 @@
         align-items: flex-start;
         & p:first-child {
             font-weight: 700;
-            font-size: 24px;
+            font-size: rem(24px);
             letter-spacing: -0.01em;
             text-align: center;
             color: #000;
         }
         & p:last-child {
             font-weight: 400;
-            font-size: 16px;
+            font-size: rem(16px);
             letter-spacing: -0.01em;
             color: #647383;
         }
@@ -56,7 +59,7 @@
         gap: 8px;
         align-items: flex-start;
         font-weight: 700;
-        font-size: 24px;
+        font-size: rem(24px);
         letter-spacing: -0.01em;
         text-align: center;
 
@@ -67,7 +70,7 @@
 }
 .bond-big-card {
     flex: 1 0 5rem;
-    padding: 16px;
+    padding: rem(16px);
     border: 1px solid rgba(58, 181, 74, 0.2);
     border-radius: 24px;
     background: #fff;
@@ -76,21 +79,21 @@
     &__header {
         display: flex;
         gap: 16px;
-        margin-bottom: 24px;
+        margin-bottom: rem(24px);
 
         h1 {
             font-weight: 700;
-            font-size: 32px;
+            font-size: rem(32px);
             letter-spacing: -0.01em;
             color: #121213;
             margin-bottom: 4px;
         }
         h2 {
             font-weight: 400;
-            font-size: 18px;
+            font-size: rem(18px);
             letter-spacing: -0.01em;
             color: #373f48;
-            margin-bottom: 12px;
+            margin-bottom: rem(12px);
         }
     }
 
@@ -118,7 +121,7 @@
         margin-bottom: 16px;
         p {
             font-weight: 400;
-            font-size: 16px;
+            font-size: rem(16px);
             letter-spacing: -0.01em;
             color: #647383;
         }
@@ -130,14 +133,14 @@
         gap: 8px;
         & p:first-child {
             font-weight: 700;
-            font-size: 18px;
+            font-size: rem(18px);
             letter-spacing: -0.01em;
             color: #121213;
         }
         & p:last-child {
             margin-left: calc(24px - 6px);
             font-weight: 400;
-            font-size: 16px;
+            font-size: rem(16px);
             letter-spacing: -0.01em;
             color: #647383;
         }
@@ -187,9 +190,13 @@
         padding: 10px 30px;
         gap: 12px;
         font-weight: 700;
-        font-size: 16px;
+        font-size: rem(16px);
         letter-spacing: -0.01em;
         color: #fff;
+
+        &:hover {
+            opacity: 0.8;
+        }
     }
     &__review {
         display: flex;
@@ -219,14 +226,14 @@
 
 .bond-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 16px;
     margin-bottom: 16px;
 
     &__item {
         border: 1px solid rgba(58, 181, 74, 0.2);
         border-radius: 24px;
-        padding: 24px;
+        padding: rem(24px);
         background: #fff;
         table {
             width: 100%;
@@ -272,6 +279,13 @@
                             flex: 0 0 180px;
                             align-items: flex-end;
                         }
+
+                        p.green {
+                            color: #3ab54a;
+                        }
+                        p.red {
+                            color: #de1f1f;
+                        }
                     }
                 }
             }
@@ -283,17 +297,6 @@
         gap: 16px;
         align-items: flex-end;
         margin-top: 32px;
-
-        & a {
-            display: flex;
-            align-items: center;
-
-            font-weight: 700;
-            font-size: 16px;
-            letter-spacing: -0.01em;
-            color: #3a65b5;
-            gap: 16px;
-        }
     }
 }
 
@@ -341,7 +344,7 @@
                     display: flex;
                     gap: 10px;
                     font-weight: 700;
-                    font-size: 18px;
+                    font-size: rem(18px);
                     letter-spacing: -0.01em;
                     color: #121213;
                     text-align: left;
@@ -357,7 +360,7 @@
             padding-left: 8px;
             th {
                 font-weight: 400;
-                font-size: 16px;
+                font-size: rem(16px);
                 letter-spacing: -0.01em;
                 color: #647383;
                 text-align: left;
@@ -483,18 +486,23 @@
     }
     .bond-card {
         .text {
-            font-size: 18px;
+            font-size: rem(18px);
 
             & p {
-                font-size: 14px;
+                font-size: rem(14px);
             }
         }
         .text-with-date {
             & p:first-child {
-                font-size: 18px;
+                font-size: rem(18px);
             }
             & p:last-child {
-                font-size: 14px;
+                font-size: rem(14px);
+            }
+        }
+        &.text-big .text {
+            p {
+                font-size: rem(18px);
             }
         }
     }
@@ -503,14 +511,14 @@
             tbody {
                 tr {
                     td {
-                        font-size: 16px;
+                        font-size: rem(16px);
                     }
                 }
             }
         }
     }
     .bond-info__item table tbody tr td:first-child {
-        font-size: 16px;
+        font-size: rem(16px);
     }
 }
 
@@ -519,9 +527,42 @@
         padding: 24px 16px;
         .text {
             p {
-                font-size: 14px;
+                font-size: rem(14px);
             }
         }
+    }
+    .bond-big-card {
+        &__header {
+            h1 {
+                font-size: rem(24px);
+            }
+            h2 {
+                font-size: 16px;
+            }
+        }
+        &__liquidity {
+            p:first-child {
+                font-size: rem(16px);
+            }
+            p:last-child {
+                font-size: rem(12px);
+            }
+        }
+    }
+    .bond-info {
+        &__item {
+            h2 {
+                font-size: rem(18px);
+            }
+        }
+    }
+    .bond-info__item table tbody tr td:first-child,
+    .bond-info__item table tbody tr td:last-child {
+        font-size: rem(12px);
+    }
+    .bond-info__item table tbody tr td:last-child {
+        flex: 0 0 100px;
+        text-align: right;
     }
 }
 

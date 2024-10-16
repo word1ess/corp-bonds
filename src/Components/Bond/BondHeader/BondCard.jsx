@@ -1,4 +1,9 @@
-export default function BondCard({ title, body, isTextGreen = false }) {
+export default function BondCard({
+  title,
+  body,
+  isTextGreen = false,
+  additionalClass = "",
+}) {
   function BondCardBody({ body }) {
     if (typeof body === "object" && !Array.isArray(body)) {
       return (
@@ -21,7 +26,7 @@ export default function BondCard({ title, body, isTextGreen = false }) {
     return <p className={`text ${isTextGreen ? "green" : ""}`}>{body}</p>;
   }
   return (
-    <article className="bond-card">
+    <article className={`bond-card ${additionalClass}`}>
       <h3>{title}</h3>
       <BondCardBody body={body} />
     </article>

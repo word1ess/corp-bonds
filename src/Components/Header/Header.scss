@@ -2,7 +2,7 @@
     @return ($px / 14px) + rem;
 }
 .header {
-    position: fixed;
+    position: absolute;
     top: 16px;
     left: 24px;
     right: 24px;
@@ -131,5 +131,10 @@
     .socials {
         margin-top: 48px;
         justify-content: flex-end;
+    }
+}
+@media only screen and (max-width: 992px) {
+    .header {
+        position: fixed;
     }
 }

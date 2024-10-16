@@ -302,7 +302,11 @@ export default function BondHeader({ bondHeader, isMobile }) {
           body={bondHeader.spreds.g}
           isTextGreen={true}
         />
-        <BondCard title="Цена" body={bondHeader.price} />
+        <BondCard
+          title="Цена"
+          body={bondHeader.price}
+          additionalClass="text-big"
+        />
         <BondCard title="Срок, лет" body={bondHeader.years.term} />
         <BondCard title="Дюрация, лет" body={bondHeader.years.duration} />
         <BondCard title="Рейтинг" body={bondHeader.rating} />
