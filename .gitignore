@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/word1ess.github.io
 /.pnp
 .pnp.js
 

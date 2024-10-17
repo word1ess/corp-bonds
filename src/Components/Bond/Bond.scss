@@ -226,7 +226,7 @@
 
 .bond-info {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(325px, 1fr));
     gap: 16px;
     margin-bottom: 16px;
 
@@ -439,16 +439,6 @@
         flex-direction: column;
         gap: 16px;
         line-height: 1.3;
-        & a {
-            display: flex;
-            align-items: center;
-            font-weight: 700;
-            font-size: 16px;
-            gap: 8px;
-
-            letter-spacing: -0.01em;
-            color: #3a65b5;
-        }
     }
 }
 
@@ -476,6 +466,11 @@
 }
 
 @media only screen and (max-width: 1600px) {
+    .bond {
+        h2 {
+            font-size: rem(18px);
+        }
+    }
     .bond-big-card {
         &__review {
             justify-content: flex-start;
@@ -483,8 +478,25 @@
         &__footer {
             margin-bottom: 16px;
         }
+        &__header {
+            h1 {
+                font-size: rem(24px);
+            }
+            h2 {
+                font-size: 16px;
+            }
+        }
+        &__liquidity {
+            p:first-child {
+                font-size: rem(16px);
+            }
+            p:last-child {
+                font-size: rem(12px);
+            }
+        }
     }
     .bond-card {
+        padding: 24px 16px;
         .text {
             font-size: rem(18px);
 
@@ -517,53 +529,39 @@
             }
         }
     }
-    .bond-info__item table tbody tr td:first-child {
-        font-size: rem(16px);
+    .bond-info {
+        &__item {
+            table tbody tr td {
+                &:first-child,
+                &:last-child {
+                    font-size: rem(12px);
+                }
+
+                &:last-child {
+                    flex: 0 0 100px;
+                    text-align: right;
+                }
+            }
+        }
+    }
+    .bond-table {
+        table {
+            tbody tr td,
+            thead th {
+                font-size: rem(12px);
+            }
+        }
+        &__footer {
+            font-size: 12px;
+            gap: 20px;
+            & button {
+                font-size: 12px;
+            }
+        }
     }
 }
 
 @media only screen and (max-width: 1280px) {
-    .bond-card {
-        padding: 24px 16px;
-        .text {
-            p {
-                font-size: rem(14px);
-            }
-        }
-    }
-    .bond-big-card {
-        &__header {
-            h1 {
-                font-size: rem(24px);
-            }
-            h2 {
-                font-size: 16px;
-            }
-        }
-        &__liquidity {
-            p:first-child {
-                font-size: rem(16px);
-            }
-            p:last-child {
-                font-size: rem(12px);
-            }
-        }
-    }
-    .bond-info {
-        &__item {
-            h2 {
-                font-size: rem(18px);
-            }
-        }
-    }
-    .bond-info__item table tbody tr td:first-child,
-    .bond-info__item table tbody tr td:last-child {
-        font-size: rem(12px);
-    }
-    .bond-info__item table tbody tr td:last-child {
-        flex: 0 0 100px;
-        text-align: right;
-    }
 }
 
 @media only screen and (max-width: 992px) {

@@ -11,8 +11,13 @@
         text-decoration: underline;
     }
 }
-@media only screen and (max-width: 1280px) {
+@media only screen and (max-width: 1400px) {
     .link-arrow {
-        font-size: 14px;
+        font-size: 12px;
+
+        img {
+            width: 16px;
+            height: 16px;
+        }
     }
 }
