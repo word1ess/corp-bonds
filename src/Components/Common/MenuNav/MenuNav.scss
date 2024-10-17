@@ -74,7 +74,7 @@
         padding: rem(8px);
     }
 }
-@media only screen and (max-width: 1600px) {
+@media only screen and (max-width: 1800px) {
     .nav-menu {
         gap: 20px;
         a {
@@ -89,6 +89,14 @@
         }
         &__form {
             width: auto;
+        }
+    }
+}
+@media only screen and (max-width: 1600px) {
+    .nav-menu {
+        gap: 20px;
+        a {
+            font-size: rem(12px);
         }
     }
 }

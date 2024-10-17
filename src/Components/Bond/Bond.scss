@@ -341,8 +341,6 @@
                 }
 
                 td {
-                    display: flex;
-                    gap: 10px;
                     font-weight: 700;
                     font-size: rem(18px);
                     letter-spacing: -0.01em;
@@ -562,6 +560,9 @@
 }
 
 @media only screen and (max-width: 1280px) {
+    .bond-card .text p {
+        font-size: rem(10px);
+    }
 }
 
 @media only screen and (max-width: 992px) {
@@ -625,6 +626,9 @@
         }
         .text {
             font-size: 18px;
+            p {
+                font-size: rem(16px);
+            }
         }
         .text-with-date {
             & p:first-child {
@@ -670,12 +674,18 @@
                 td,
                 th {
                     &:first-child {
+                        display: flex;
+
                         min-width: 90px;
+                        flex-direction: column;
+                        gap: 0px;
                     }
                     &:nth-child(2) {
                         min-width: 110px;
+                        justify-content: center;
                     }
                     &:nth-child(3) {
+                        justify-content: flex-end;
                         min-width: 90px;
                     }
                 }

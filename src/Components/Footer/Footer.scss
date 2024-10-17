@@ -8,19 +8,19 @@
     position: relative;
 
     &__logo {
-        p {
-            margin-top: 16px;
-            font-weight: 400;
-            font-size: 14px;
-            letter-spacing: -0.01em;
-            color: #8599b1;
-        }
         .nav-menu__logo {
             height: 80px;
             width: 80px;
         }
     }
 
+    &__copy {
+        margin-top: 16px;
+        font-weight: 400;
+        font-size: 14px;
+        letter-spacing: -0.01em;
+        color: #8599b1;
+    }
     &__nav {
         display: flex;
         gap: 40px;
@@ -63,9 +63,9 @@
     .footer {
         flex-wrap: nowrap;
         align-items: stretch;
+        flex-direction: column;
         &__logo {
-            display: flex;
-            flex-direction: column;
+            display: block;
             flex: 1 0 5rem;
             max-width: fit-content;
         }
@@ -78,20 +78,28 @@
             transform: none;
             margin-top: auto;
             margin-left: 0px;
+            max-width: 180px;
             & a {
                 text-align: left;
             }
         }
         &__copy {
-            margin-top: 32px;
+            margin-top: 40px;
+            max-width: 210px;
+        }
+        .socials {
+            bottom: 100px;
         }
         .nav-menu {
             flex-direction: column;
-            align-items: flex-end;
             flex: 1 0 5rem;
-
+            margin: 24px 0px 24px 0px;
+            padding: 24px 0px;
+            border-top: 1px solid #eff2f6;
+            border-bottom: 1px solid #eff2f6;
             & a {
                 text-align: right;
+                font-size: 16px;
             }
         }
     }
