@@ -22,6 +22,14 @@ export default function BondInfoItem({ title, body, links = null, linkImg }) {
       );
     }
     if (typeof bodyItem === "object") {
+      if ("link" in bodyItem) {
+        return (
+          <td>
+            <CustomLinkArrow text={bodyItem.text} link={bodyItem.link} />
+          </td>
+        );
+      }
+
       return (
         <td>
           <TableDataInner innerText={bodyItem.text} />

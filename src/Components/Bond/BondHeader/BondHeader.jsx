@@ -5,7 +5,7 @@ import CustomTooltip from "../../Common/CustomTooltip/CustomTooltip";
 import CustomLinkArrow from "../../Common/LinkWithArrow/LinkWithArrow";
 
 export default function BondHeader({ bondHeader, isMobile }) {
-  const liquiditySteps = Array(5)
+  const liquiditySteps = Array(4)
     .fill(false)
     .fill(true, 0, bondHeader.liquidity.stage);
 
@@ -39,6 +39,7 @@ export default function BondHeader({ bondHeader, isMobile }) {
                 );
               })}
             </div>
+            <CustomTooltip parent="liquidity" place="top" />
             <p>{bondHeader.liquidity.moneyInDay}</p>
           </div>
         </>

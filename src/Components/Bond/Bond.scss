@@ -165,11 +165,8 @@
             &:nth-child(3) {
                 height: 17px;
             }
-            &:nth-child(4) {
-                height: 21px;
-            }
             &:last-child {
-                height: 25px;
+                height: 21px;
             }
         }
     }
@@ -276,8 +273,12 @@
                             font-size: 18px;
                             letter-spacing: -0.01em;
                             color: #121213;
-                            flex: 0 0 180px;
+                            flex: 0 0 220px;
                             align-items: flex-end;
+                        }
+
+                        a {
+                            font-size: 16px;
                         }
 
                         p.green {
@@ -466,7 +467,7 @@
 @media only screen and (max-width: 1600px) {
     .bond {
         h2 {
-            font-size: rem(18px);
+            font-size: rem(16px);
         }
     }
     .bond-big-card {
@@ -531,13 +532,24 @@
         &__item {
             table tbody tr td {
                 &:first-child,
-                &:last-child {
-                    font-size: rem(12px);
+                &:last-child,
+                & a {
+                    font-size: rem(14px);
                 }
 
                 &:last-child {
-                    flex: 0 0 100px;
+                    flex: 0 0 130px;
                     text-align: right;
+                }
+            }
+        }
+        &__links {
+            a {
+                font-size: 12px;
+
+                & img {
+                    width: 20px;
+                    height: 20px;
                 }
             }
         }
@@ -546,7 +558,7 @@
         table {
             tbody tr td,
             thead th {
-                font-size: rem(12px);
+                font-size: rem(14px);
             }
         }
         &__footer {
@@ -561,11 +573,11 @@
 
 @media only screen and (max-width: 1280px) {
     .bond-card .text p {
-        font-size: rem(10px);
+        font-size: rem(13px);
     }
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 1150px) {
     .bond {
         h2 {
             font-size: 20px;
