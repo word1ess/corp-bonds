@@ -11,6 +11,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import ErrorPage from "./Components/Common/Error";
 import Bond from "./Components/Bond/Bond";
+import Screener from "./Components/Screener/Screener";
 
 // import getBond from "./RoutsActions/getBond";
 
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
         // loader: getBond,
         path: "bond/",
         element: <Bond />,
+      },
+      {
+        // loader: getBond,
+        path: "screener/",
+        element: <Screener />,
       },
     ],
   },

@@ -9,6 +9,7 @@ function App() {
   const checkIsMobile = (width) => {
     return width < 992 ? true : false;
   };
+
   const [isMobile, setisMobile] = useState(checkIsMobile(window.innerWidth));
 
   useEffect(() => {

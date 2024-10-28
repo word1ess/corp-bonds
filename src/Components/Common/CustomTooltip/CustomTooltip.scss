@@ -13,6 +13,21 @@
     align-self: flex-start;
     flex: 0 0 12px;
 }
+.tooltip-plus {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    background: #3ab54a;
+    color: #fff;
+    font-size: 16px;
+    line-height: 0.1;
+    border: none;
+
+    & + .react-tooltip {
+        font-size: 14px;
+        max-width: fit-content;
+    }
+}
 .react-tooltip {
     border: 1px solid rgba(58, 181, 74, 0.2);
     border-radius: 20px 20px 20px 0;

@@ -5,11 +5,11 @@ export default function MenuNav() {
   return (
     <nav className="nav-menu">
       <Link to="/bond">Портфель</Link>
-      <Link href="#">Скринер</Link>
-      <Link href="#">Аналитика</Link>
-      <Link href="#">Первичные размещения</Link>
-      <Link href="#">Обучение</Link>
-      <Link href="#">Тарифы</Link>
+      <Link to="/screener">Скринер</Link>
+      <Link to="#">Аналитика</Link>
+      <Link to="#">Первичные размещения</Link>
+      <Link to="#">Обучение</Link>
+      <Link to="#">Тарифы</Link>
     </nav>
   );
 }
