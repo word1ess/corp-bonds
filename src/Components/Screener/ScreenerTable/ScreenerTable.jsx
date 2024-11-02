@@ -136,25 +136,47 @@ const RatingTable = ({
     );
 
     // Создаем новый объект для обновления состояния
-    const newSelection = {};
-    ratingAgencies.forEach((agency) => {
-      newSelection[agency] = !allSelected; // Устанавливаем новое состояние
-    });
+    const newSelection = { ...currentSelection }; // Копируем текущее состояние
 
-    handleRatingChange([rating, newSelection]); // Обновляем состояние
+    if (allSelected) {
+      // Если все выбраны, сбрасываем все
+      ratingAgencies.forEach((agency) => {
+        newSelection[agency] = false; // Устанавливаем все в false
+      });
+    } else {
+      // Если не все выбраны, добавляем оставшиеся
+      ratingAgencies.forEach((agency) => {
+        newSelection[agency] = true; // Устанавливаем оставшиеся в true
+      });
+    }
+
+    handleRatingChange("multy", { rating, newSelection }); // Обновляем состояние
   };
   const columns = useMemo(
     () => [
       {
         Header: "",
         accessor: "rating",
-        Cell: ({ value }) => (
-          <div>
-            {value}
-            <button onClick={() => toggleAll(value)}>Toggle All</button>
-            {/* Кнопка тоггл */}
-          </div>
-        ),
+        Cell: ({ value }) => {
+          let isActive = false;
+
+          if (selectedRatings[value]) {
+            isActive = ratingAgencies.every(
+              (agency) => selectedRatings[value][agency]
+            );
+          }
+          return (
+            <label>
+              {value}
+
+              <button
+                className={`switch-btn ${isActive ? "active" : ""}`}
+                onClick={() => toggleAll(value)}
+              ></button>
+              {/* Кнопка тоггл */}
+            </label>
+          );
+        },
       },
       ...ratingAgencies.map((agency) => ({
         Header: agency,
@@ -163,7 +185,9 @@ const RatingTable = ({
             <input
               type="checkbox"
               checked={row.agencies.find((a) => a.agency === agency).selected}
-              onChange={() => handleRatingChange([row.rating, agency])}
+              onChange={() =>
+                handleRatingChange("single", [row.rating, agency])
+              }
             />
             <span></span>
           </label>
@@ -198,6 +222,10 @@ const RatingTable = ({
 
       {isOpen && (
         <div className="range-dropdown-filter__content">
+          <header className="range-dropdown-filter__description">
+            Нажмите <button className="switch-btn"></button>, чтобы выбрать все
+            значения в строке ( рейтинг у всех агентств)
+          </header>
           <table {...getTableProps()}>
             <thead>
               {headerGroups.map((headerGroup) => (
@@ -1210,28 +1238,56 @@ const TableComponent = () => {
     return cols.filter((col) => col.showColumn !== false); // Фильтруем колонки по видимости
   }, [defaultVisibility.visibility]);
 
-  // Обработчик изменения состояния чекбоксов рейтингов
-  const handleRatingChange = (data) => {
+  const handleRatingChange = (type, data) => {
     setSelectedRatings((prev) => {
       const updatedRatings = { ...prev };
-
-      if (typeof data[0] === "string") {
-        const [rating, agency] = data;
+      // Функция для установки состояния агентств
+      const setRatings = (rating, agency) => {
         if (agency) {
           // Если агентство выбрано, добавляем его
           if (!updatedRatings[rating]) {
             updatedRatings[rating] = {};
           }
-          updatedRatings[rating][agency] = !updatedRatings[rating][agency]; // Переключаем состояние
+          // Переключаем состояние агентства
+          updatedRatings[rating][agency] = !updatedRatings[rating][agency];
         }
+
         // Удаляем рейтинг, если все агентства сняты
-        const agencies = updatedRatings[rating];
-        if (agencies && Object.values(agencies).every((val) => !val)) {
+        if (
+          updatedRatings[rating] &&
+          Object.values(updatedRatings[rating]).every((val) => !val)
+        ) {
+          delete updatedRatings[rating];
+        }
+      };
+
+      // Обработка одиночного выбора
+      if (type === "single") {
+        setRatings(...data);
+      }
+
+      // Обработка множественного выбора
+      if (type === "multy") {
+        const { rating, newSelection } = data;
+
+        // Обновляем состояние для каждого агентства
+        Object.keys(newSelection).forEach((agency) => {
+          if (!updatedRatings[rating]) {
+            updatedRatings[rating] = {};
+          }
+          updatedRatings[rating][agency] = newSelection[agency]; // Устанавливаем состояние на основе newSelection
+        });
+
+        // Удаляем рейтинг, если все агентства сняты
+        if (
+          updatedRatings[rating] &&
+          Object.values(updatedRatings[rating]).every((val) => !val)
+        ) {
           delete updatedRatings[rating];
         }
       }
 
-      return updatedRatings;
+      return updatedRatings; // Возвращаем обновленное состояние
     });
   };
   // Открытие попапа

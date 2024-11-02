@@ -135,7 +135,7 @@
 
     &.active {
         .range-dropdown-filter__header {
-            min-width: 370px;
+            min-width: 430px;
         }
     }
     th,
@@ -388,53 +388,6 @@
         top: 37px;
         width: 100%;
         max-width: 500px;
-
-        label {
-            font-weight: 400;
-            font-size: 16px;
-            letter-spacing: -0.01em;
-            color: #373f48;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-        input[type="checkbox"] {
-            appearance: none; /* Убираем стандартный стиль */
-            width: 40px; /* Ширина переключателя */
-            height: 20px; /* Высота переключателя */
-        }
-
-        input[type="checkbox"]:checked + .switch-btn {
-            background-color: #47cb8f; /* Цвет фона при включении */
-        }
-
-        .switch-btn {
-            width: 40px; /* Ширина переключателя */
-            height: 20px; /* Высота переключателя */
-            background: #e5e5e5; /* Цвет фона выключенного состояния */
-            position: relative; /* Для позиционирования внутреннего круга */
-            border-radius: 20px; /* Скругление углов переключателя */
-            transition: background-color 0.3s ease; /* Плавный переход цвета фона */
-        }
-
-        .switch-btn::before {
-            content: "";
-            position: absolute;
-            height: 15px; /* Высота внутреннего круга */
-            width: 15px; /* Ширина внутреннего круга */
-            background: white; /* Цвет внутреннего круга */
-            border-radius: 50%; /* Скругление углов внутреннего круга */
-            transition: transform 0.3s ease; /* Плавный переход движения круга */
-            top: 2.5px;
-            bottom: 2.5px;
-            left: 2.5px;
-        }
-
-        /* Позиционирование внутреннего круга при включении переключателя */
-        input[type="checkbox"]:checked + .switch-btn::before {
-            transform: translateX(20px); /* Сдвигаем круг вправо при включении */
-        }
     }
     &__toggle-btns {
         max-height: 320px;
@@ -522,6 +475,11 @@
                 margin-bottom: 8px;
             }
         }
+        &__description {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #8599b1;
+        }
         &__row {
             display: flex;
             align-items: center;
@@ -604,6 +562,69 @@
         color: #8599b1;
         width: 100%;
     }
+}
+label {
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    color: #373f48;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+
+    & > input {
+        &[type="checkbox"] {
+            appearance: none; /* Убираем стандартный стиль */
+            width: 32px; /* Ширина переключателя */
+            height: 16px; /* Высота переключателя */
+        }
+        &[type="checkbox"]:checked + .switch-btn {
+            background-color: #47cb8f; /* Цвет фона при включении */
+        }
+        /* Позиционирование внутреннего круга при включении переключателя */
+        &[type="checkbox"]:checked + .switch-btn::before {
+            transform: translateX(14px); /* Сдвигаем круг вправо при включении */
+        }
+    }
+    & > button.switch-btn {
+        margin-left: 10px;
+        &.active {
+            transition: all 300ms ease;
+            background-color: #47cb8f; /* Цвет фона при включении */
+            &::before {
+                background: #fff;
+                transform: translateX(14px); /* Сдвигаем круг вправо при включении */
+            }
+        }
+    }
+}
+
+.switch-btn {
+    width: 32px; /* Ширина переключателя */
+    height: 16px; /* Высота переключателя */
+    background: #e5e5e5; /* Цвет фона выключенного состояния */
+    position: relative; /* Для позиционирования внутреннего круга */
+    border-radius: 20px; /* Скругление углов переключателя */
+    transition: all 0.3s ease; /* Плавный переход цвета фона */
+}
+
+.switch-btn::before {
+    content: "";
+    position: absolute;
+    height: 13px; /* Высота внутреннего круга */
+    width: 13px; /* Ширина внутреннего круга */
+    background: #8599b1; /* Цвет внутреннего круга */
+    border-radius: 50%; /* Скругление углов внутреннего круга */
+    transition: transform 0.3s ease; /* Плавный переход движения круга */
+    top: 2px;
+    bottom: 2px;
+    left: 2.5px;
+}
+
+/* Позиционирование внутреннего круга при включении переключателя */
+input[type="checkbox"]:checked + .switch-btn::before {
+    transform: translateX(20px); /* Сдвигаем круг вправо при включении */
 }
 @media only screen and (max-width: 1600px) {
     .table {
