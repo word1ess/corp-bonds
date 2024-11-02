@@ -1,7 +1,6 @@
 import "./Bond.scss";
 
-// import { useLoaderData } from "react-router-dom";
-import { useSelector } from "react-redux";
+import linkImg from "../../img/link-arrow.svg";
 import { useOutletContext } from "react-router-dom";
 
 import BondHeader from "./BondHeader/BondHeader";
@@ -10,10 +9,8 @@ import BondTables from "./BondTables/BondTables";
 import BondChart from "./BondChart/BondChart";
 import BondLinks from "./BondLinks/BondLinks";
 
-export default function Bond() {
+export default function BondPopup({ bondData }) {
   const isMobile = useOutletContext();
-  const bondData = useSelector((state) => state.bond.bonds[0]);
-
   return (
     <section className="bond">
       <BondHeader bondHeader={bondData.bondHeader} isMobile={isMobile} />

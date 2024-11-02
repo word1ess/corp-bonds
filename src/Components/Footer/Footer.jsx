@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import MenuNav from "../Common/MenuNav/MenuNav";
 
-import logo from "../../img/logo.webp";
+import logo from "../../img/logo.svg";
 import Socials from "../Common/Socials/Socials";
 
 function Footer({ isMobile }) {

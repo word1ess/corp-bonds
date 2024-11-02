@@ -5,7 +5,7 @@ import { useRef } from "react";
 
 import MenuNav from "../Common/MenuNav/MenuNav";
 
-import logo from "../../img/logo.webp";
+import logo from "../../img/logo.svg";
 import tg from "../../img/tg.svg";
 import profile from "../../img/profile.svg";
 import Socials from "../Common/Socials/Socials";

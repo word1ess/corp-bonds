@@ -39,6 +39,9 @@
             padding-bottom: 24px;
         }
     }
+    &.popup-open {
+        z-index: 1;
+    }
 
     &__row {
         display: flex;
