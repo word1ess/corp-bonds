@@ -41,7 +41,7 @@ const MultiSelectFilter = ({
         value={selectedValues}
         onChange={handleChange}
         labelledBy={label}
-        selectionLimit={0}
+        selectionLimit={selectionLimit}
         overrideStrings={{
           selectSomeItems: label,
           allItemsAreSelected: "Все элементы выбраны",
@@ -312,283 +312,291 @@ const ScreenerBlockFilters = ({
     setFilters({ type: "RESET_FILTER" }); // Сбрасываем редюсер фильтров
   };
 
-  return (
-    <header className="screener__block">
-      <div className="search">
-        <input
-          type="text"
-          placeholder="Поиск по названию или ISIN"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+  const ScreenerBlockFiltersPC = ({}) => {
+    const [isOpenFilters, setIsOpenFilters] = useState(false);
+    const toggleFilters = () => {
+      setIsOpenFilters((prev) => !prev);
+    };
+    return (
+      <>
+        <MultiSelectFilter
+          label="Эмитент"
+          options={uniqueValues("issuer")}
+          selectedValues={filters.issuer}
+          onChange={(selected) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "issuer",
+              value: selected,
+            })
+          }
         />
-      </div>
-      <div className="screener__filters">
-        <div className="screener__filters-row">
-          {isMobile ? (
-            <>
-              <div
-                data-filter="ytm"
-                className="screener__filters-formobile range-dropdown-filter__header"
-                onClick={() => toggleDropdown("ytm")}
-              >
-                <h3 style={{ cursor: "pointer" }}>YTM</h3>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="dropdown-heading-dropdown-arrow gray"
-                >
-                  <path d="M6 9L12 15 18 9"></path>
-                </svg>
-              </div>
-              <div
-                data-filter="mSrped"
-                className="screener__filters-formobile range-dropdown-filter__header"
-                onClick={() => toggleDropdown("msrped")}
-              >
-                <h3 style={{ cursor: "pointer" }}>М Спред</h3>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="dropdown-heading-dropdown-arrow gray"
-                >
-                  <path d="M6 9L12 15 18 9"></path>
-                </svg>
-              </div>
-              <div
-                data-filter="rating"
-                className="screener__filters-formobile range-dropdown-filter__header"
-                onClick={() => toggleDropdown("ratings")}
-              >
-                <h3 style={{ cursor: "pointer" }}>Рейтинг</h3>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="dropdown-heading-dropdown-arrow gray"
-                >
-                  <path d="M6 9L12 15 18 9"></path>
-                </svg>
-              </div>
-              <div
-                data-filter="term"
-                className="screener__filters-formobile range-dropdown-filter__header"
-                onClick={() => toggleDropdown("term")}
-              >
-                <h3 style={{ cursor: "pointer" }}>Срок</h3>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="dropdown-heading-dropdown-arrow gray"
-                >
-                  <path d="M6 9L12 15 18 9"></path>
-                </svg>
-              </div>
-              <div
-                data-filter="duration"
-                className="screener__filters-formobile range-dropdown-filter__header"
-                onClick={() => toggleDropdown("duration")}
-              >
-                <h3 style={{ cursor: "pointer" }}>Дюрация</h3>
-                <svg
-                  width="24"
-                  height="24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  class="dropdown-heading-dropdown-arrow gray"
-                >
-                  <path d="M6 9L12 15 18 9"></path>
-                </svg>
-              </div>
+        <RangeDropdownFilter
+          label="YTM"
+          minValue={filters.ytm.min}
+          maxValue={filters.ytm.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "ytm",
+              value: { ...filters.ytm, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "ytm",
+              value: { ...filters.ytm, max: value },
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="М-спред"
+          minValue={filters.mSpread.min}
+          maxValue={filters.mSpread.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "mSpread",
+              value: { ...filters.mSpread, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "mSpread",
+              value: { ...filters.mSpread, max: value },
+            })
+          }
+        />
+        <RatingTable
+          selectedRatings={selectedRatings}
+          handleRatingChange={handleRatingChange}
+        />
+        <RangeDropdownFilter
+          label="Срок обращения"
+          minValue={filters.term.min}
+          maxValue={filters.term.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "term",
+              value: { ...filters.term, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "term",
+              value: { ...filters.term, max: value },
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="Дюрация"
+          minValue={filters.duration.min}
+          maxValue={filters.duration.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "duration",
+              value: { ...filters.duration, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "duration",
+              value: { ...filters.duration, max: value },
+            })
+          }
+        />
+        <MultiSelectFilter
+          label="Тип бумаги"
+          options={uniqueValues("type")}
+          selectedValues={filters.type}
+          onChange={(selected) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "type",
+              value: selected,
+            })
+          }
+        />
 
-              {isOpen && (
-                <div className="screener__filters-popup">
-                  <div className="screener__filters-popup-row">
-                    <button
-                      className="popup-close"
-                      onClick={handleCloseClick}
-                    ></button>
-                    <RangeDropdownFilter
-                      label="YTM"
-                      minValue={filters.ytm.min}
-                      maxValue={filters.ytm.max}
-                      isOpenProps={isCurrent.ytm}
-                      onMinChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "ytm",
-                          value: { ...filters.ytm, min: value },
-                        })
-                      }
-                      onMaxChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "ytm",
-                          value: { ...filters.ytm, max: value },
-                        })
-                      }
-                    />
-                    <RangeDropdownFilter
-                      label="М-спред"
-                      minValue={filters.mSpread.min}
-                      maxValue={filters.mSpread.max}
-                      isOpenProps={isCurrent.mSpread}
-                      onMinChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "mSpread",
-                          value: { ...filters.mSpread, min: value },
-                        })
-                      }
-                      onMaxChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "mSpread",
-                          value: { ...filters.mSpread, max: value },
-                        })
-                      }
-                    />
-                    <RatingTable
-                      selectedRatings={selectedRatings}
-                      handleRatingChange={handleRatingChange}
-                      isOpenProps={isCurrent.ratings}
-                    />
-                    <RangeDropdownFilter
-                      label="Срок обращения"
-                      minValue={filters.term.min}
-                      maxValue={filters.term.max}
-                      isOpenProps={isCurrent.term}
-                      onMinChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "term",
-                          value: { ...filters.term, min: value },
-                        })
-                      }
-                      onMaxChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "term",
-                          value: { ...filters.term, max: value },
-                        })
-                      }
-                    />
-                    <RangeDropdownFilter
-                      label="Дюрация"
-                      minValue={filters.duration.min}
-                      maxValue={filters.duration.max}
-                      isOpenProps={isCurrent.duration}
-                      onMinChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "duration",
-                          value: { ...filters.duration, min: value },
-                        })
-                      }
-                      onMaxChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "duration",
-                          value: { ...filters.duration, max: value },
-                        })
-                      }
-                    />
-                    <MultiSelectFilter
-                      label="Эмитент"
-                      options={uniqueValues("issuer")}
-                      selectedValues={filters.issuer}
-                      onChange={(selected) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "issuer",
-                          value: selected,
-                        })
-                      }
-                    />
-                    <RangeDropdownFilter
-                      label="Объем торгов за сегодня"
-                      minValue={filters.tradingVolumeTodayRUB.min}
-                      maxValue={filters.tradingVolumeTodayRUB.max}
-                      onMinChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "tradingVolumeTodayRUB",
-                          value: {
-                            ...filters.tradingVolumeTodayRUB,
-                            min: value,
-                          },
-                        })
-                      }
-                      onMaxChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "tradingVolumeTodayRUB",
-                          value: {
-                            ...filters.tradingVolumeTodayRUB,
-                            max: value,
-                          },
-                        })
-                      }
-                    />
-                    <RangeDropdownFilter
-                      label="Частота купона"
-                      minValue={filters.couponFrequency.min}
-                      maxValue={filters.couponFrequency.max}
-                      onMinChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "couponFrequency",
-                          value: { ...filters.couponFrequency, min: value },
-                        })
-                      }
-                      onMaxChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "couponFrequency",
-                          value: { ...filters.couponFrequency, max: value },
-                        })
-                      }
-                    />
-                    <RangeDropdownFilter
-                      label="G-спред"
-                      minValue={filters.gSpread.min}
-                      maxValue={filters.gSpread.max}
-                      onMinChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "gSpread",
-                          value: { ...filters.gSpread, min: value },
-                        })
-                      }
-                      onMaxChange={(value) =>
-                        setFilters({
-                          type: "SET_FILTER",
-                          filter: "gSpread",
-                          value: { ...filters.gSpread, max: value },
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
+        {isOpenFilters && (
+          <>
+            <RangeDropdownFilter
+              label="G-спред"
+              minValue={filters.gSpread.min}
+              maxValue={filters.gSpread.max}
+              isOpenProps={isOpen && isCurrent}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "gSpread",
+                  value: { ...filters.gSpread, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "gSpread",
+                  value: { ...filters.gSpread, max: value },
+                })
+              }
+            />
+            <RangeDropdownFilter
+              label="Объем торгов за сегодня"
+              minValue={filters.tradingVolumeTodayRUB.min}
+              maxValue={filters.tradingVolumeTodayRUB.max}
+              isOpenProps={isOpen && isCurrent}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "tradingVolumeTodayRUB",
+                  value: { ...filters.tradingVolumeTodayRUB, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "tradingVolumeTodayRUB",
+                  value: { ...filters.tradingVolumeTodayRUB, max: value },
+                })
+              }
+            />
+
+            <RangeDropdownFilter
+              label="Частота купона"
+              minValue={filters.couponFrequency.min}
+              maxValue={filters.couponFrequency.max}
+              isOpenProps={isOpen && isCurrent}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "couponFrequency",
+                  value: { ...filters.couponFrequency, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "couponFrequency",
+                  value: { ...filters.couponFrequency, max: value },
+                })
+              }
+            />
+          </>
+        )}
+
+        <button className="link-arrow" onClick={toggleFilters}>
+          {isOpenFilters ? "Скрыть фильтры" : "Показать фильтры"}
+        </button>
+      </>
+    );
+  };
+  const ScreenerBlockFiltersMobile = ({}) => {
+    return (
+      <>
+        <div
+          data-filter="ytm"
+          className="screener__filters-formobile range-dropdown-filter__header"
+          onClick={() => toggleDropdown("ytm")}
+        >
+          <h3 style={{ cursor: "pointer" }}>YTM</h3>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="dropdown-heading-dropdown-arrow gray"
+          >
+            <path d="M6 9L12 15 18 9"></path>
+          </svg>
+        </div>
+        <div
+          data-filter="mSrped"
+          className="screener__filters-formobile range-dropdown-filter__header"
+          onClick={() => toggleDropdown("msrped")}
+        >
+          <h3 style={{ cursor: "pointer" }}>М Спред</h3>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="dropdown-heading-dropdown-arrow gray"
+          >
+            <path d="M6 9L12 15 18 9"></path>
+          </svg>
+        </div>
+        <div
+          data-filter="rating"
+          className="screener__filters-formobile range-dropdown-filter__header"
+          onClick={() => toggleDropdown("ratings")}
+        >
+          <h3 style={{ cursor: "pointer" }}>Рейтинг</h3>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="dropdown-heading-dropdown-arrow gray"
+          >
+            <path d="M6 9L12 15 18 9"></path>
+          </svg>
+        </div>
+        <div
+          data-filter="term"
+          className="screener__filters-formobile range-dropdown-filter__header"
+          onClick={() => toggleDropdown("term")}
+        >
+          <h3 style={{ cursor: "pointer" }}>Срок</h3>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="dropdown-heading-dropdown-arrow gray"
+          >
+            <path d="M6 9L12 15 18 9"></path>
+          </svg>
+        </div>
+        <div
+          data-filter="duration"
+          className="screener__filters-formobile range-dropdown-filter__header"
+          onClick={() => toggleDropdown("duration")}
+        >
+          <h3 style={{ cursor: "pointer" }}>Дюрация</h3>
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            class="dropdown-heading-dropdown-arrow gray"
+          >
+            <path d="M6 9L12 15 18 9"></path>
+          </svg>
+        </div>
+
+        {isOpen && (
+          <div className="screener__filters-popup">
+            <div className="screener__filters-popup-row">
+              <button
+                className="popup-close"
+                onClick={handleCloseClick}
+              ></button>
               <RangeDropdownFilter
                 label="YTM"
                 minValue={filters.ytm.min}
                 maxValue={filters.ytm.max}
+                isOpenProps={isCurrent.ytm}
                 onMinChange={(value) =>
                   setFilters({
                     type: "SET_FILTER",
@@ -608,6 +616,7 @@ const ScreenerBlockFilters = ({
                 label="М-спред"
                 minValue={filters.mSpread.min}
                 maxValue={filters.mSpread.max}
+                isOpenProps={isCurrent.mSpread}
                 onMinChange={(value) =>
                   setFilters({
                     type: "SET_FILTER",
@@ -623,15 +632,16 @@ const ScreenerBlockFilters = ({
                   })
                 }
               />
-              {/* Вставка таблицы рейтингов */}
               <RatingTable
                 selectedRatings={selectedRatings}
                 handleRatingChange={handleRatingChange}
+                isOpenProps={isCurrent.ratings}
               />
               <RangeDropdownFilter
                 label="Срок обращения"
                 minValue={filters.term.min}
                 maxValue={filters.term.max}
+                isOpenProps={isCurrent.term}
                 onMinChange={(value) =>
                   setFilters({
                     type: "SET_FILTER",
@@ -651,6 +661,7 @@ const ScreenerBlockFilters = ({
                 label="Дюрация"
                 minValue={filters.duration.min}
                 maxValue={filters.duration.max}
+                isOpenProps={isCurrent.duration}
                 onMinChange={(value) =>
                   setFilters({
                     type: "SET_FILTER",
@@ -663,59 +674,6 @@ const ScreenerBlockFilters = ({
                     type: "SET_FILTER",
                     filter: "duration",
                     value: { ...filters.duration, max: value },
-                  })
-                }
-              />
-
-              <MultiSelectFilter
-                label="Тип бумаги"
-                options={uniqueValues("type")}
-                selectedValues={filters.type}
-                onChange={(selected) =>
-                  setFilters({
-                    type: "SET_FILTER",
-                    filter: "type",
-                    value: selected,
-                  })
-                }
-              />
-              <RangeDropdownFilter
-                label="G-спред"
-                minValue={filters.gSpread.min}
-                maxValue={filters.gSpread.max}
-                isOpenProps={isOpen && isCurrent}
-                onMinChange={(value) =>
-                  setFilters({
-                    type: "SET_FILTER",
-                    filter: "gSpread",
-                    value: { ...filters.gSpread, min: value },
-                  })
-                }
-                onMaxChange={(value) =>
-                  setFilters({
-                    type: "SET_FILTER",
-                    filter: "gSpread",
-                    value: { ...filters.gSpread, max: value },
-                  })
-                }
-              />
-              <RangeDropdownFilter
-                label="Объем торгов за сегодня"
-                minValue={filters.tradingVolumeTodayRUB.min}
-                maxValue={filters.tradingVolumeTodayRUB.max}
-                isOpenProps={isOpen && isCurrent}
-                onMinChange={(value) =>
-                  setFilters({
-                    type: "SET_FILTER",
-                    filter: "tradingVolumeTodayRUB",
-                    value: { ...filters.tradingVolumeTodayRUB, min: value },
-                  })
-                }
-                onMaxChange={(value) =>
-                  setFilters({
-                    type: "SET_FILTER",
-                    filter: "tradingVolumeTodayRUB",
-                    value: { ...filters.tradingVolumeTodayRUB, max: value },
                   })
                 }
               />
@@ -732,10 +690,34 @@ const ScreenerBlockFilters = ({
                 }
               />
               <RangeDropdownFilter
+                label="Объем торгов за сегодня"
+                minValue={filters.tradingVolumeTodayRUB.min}
+                maxValue={filters.tradingVolumeTodayRUB.max}
+                onMinChange={(value) =>
+                  setFilters({
+                    type: "SET_FILTER",
+                    filter: "tradingVolumeTodayRUB",
+                    value: {
+                      ...filters.tradingVolumeTodayRUB,
+                      min: value,
+                    },
+                  })
+                }
+                onMaxChange={(value) =>
+                  setFilters({
+                    type: "SET_FILTER",
+                    filter: "tradingVolumeTodayRUB",
+                    value: {
+                      ...filters.tradingVolumeTodayRUB,
+                      max: value,
+                    },
+                  })
+                }
+              />
+              <RangeDropdownFilter
                 label="Частота купона"
                 minValue={filters.couponFrequency.min}
                 maxValue={filters.couponFrequency.max}
-                isOpenProps={isOpen && isCurrent}
                 onMinChange={(value) =>
                   setFilters({
                     type: "SET_FILTER",
@@ -751,7 +733,48 @@ const ScreenerBlockFilters = ({
                   })
                 }
               />
-            </>
+              <RangeDropdownFilter
+                label="G-спред"
+                minValue={filters.gSpread.min}
+                maxValue={filters.gSpread.max}
+                onMinChange={(value) =>
+                  setFilters({
+                    type: "SET_FILTER",
+                    filter: "gSpread",
+                    value: { ...filters.gSpread, min: value },
+                  })
+                }
+                onMaxChange={(value) =>
+                  setFilters({
+                    type: "SET_FILTER",
+                    filter: "gSpread",
+                    value: { ...filters.gSpread, max: value },
+                  })
+                }
+              />
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <header className="screener__block">
+      <div className="search">
+        <input
+          type="text"
+          placeholder="Поиск по названию или ISIN"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <div className="screener__filters">
+        <div className="screener__filters-row">
+          {isMobile ? (
+            <ScreenerBlockFiltersMobile />
+          ) : (
+            <ScreenerBlockFiltersPC />
           )}
         </div>
         <div className="screener__filter-btns">
@@ -840,6 +863,17 @@ const DataTable = ({ data, columns, onRowClick }) => {
         break;
     }
     return shortName;
+  };
+  const setClassSpread = (value) => {
+    let className = "";
+    if (value < 10) {
+      className = "red";
+    } else if (value > 10) {
+      className = "green";
+    } else {
+      className = "yellow";
+    }
+    return className;
   };
   return (
     <div className="screener__table-wrapper">
@@ -954,20 +988,21 @@ const DataTable = ({ data, columns, onRowClick }) => {
             return (
               <tr {...row.getRowProps()} onClick={() => onRowClick(i)}>
                 {row.cells.map((cell, i) => (
-                  <td
-                    className={cell.column.id}
-                    width="40px"
-                    {...cell.getCellProps()}
-                  >
-                    {cell.column.id === "ratings" // Отображение рейтингов
-                      ? cell.value.map(({ agency, rating }) => {
-                          return (
-                            <div key={agency}>
-                              {rating}({getShortNameAgency(agency)})
-                            </div>
-                          );
-                        })
-                      : cell.render("Cell")}
+                  <td className={cell.column.id} {...cell.getCellProps()}>
+                    {cell.column.id === "ratings" ? (
+                      cell.value.map(({ agency, rating }) => (
+                        <div key={agency}>
+                          {rating}({getShortNameAgency(agency)})
+                        </div>
+                      ))
+                    ) : cell.column.id === "mSpread" ||
+                      cell.column.id === "gSpread" ? (
+                      <div className={setClassSpread(cell.value)}>
+                        {cell.value}
+                      </div> // Здесь можно настроить отображение для mSpread
+                    ) : (
+                      cell.render("Cell")
+                    )}
 
                     {cell.column.id === "title" && (
                       <>
@@ -1025,8 +1060,8 @@ const TableComponent = () => {
       couponFrequency: false,
     },
     titles: {
-      term: "Срок",
-      duration: "Дюрация",
+      term: "Срок, лет",
+      duration: "Дюрация, %",
       ratings: "Кредитный рейтинг",
       ytm: "YTM",
       mSpread: "М-спред",
@@ -1146,9 +1181,13 @@ const TableComponent = () => {
         textTooltip: "lorem",
         sticky: true,
       },
-      { Header: "Срок", accessor: "term", showColumn: columnVisibility.term },
       {
-        Header: "Дюрация",
+        Header: "Срок, лет",
+        accessor: "term",
+        showColumn: columnVisibility.term,
+      },
+      {
+        Header: "Дюрация, %",
         accessor: "duration",
         showColumn: columnVisibility.duration,
       },
