@@ -154,14 +154,14 @@
 }
 .rating-table-container {
     background: #eff2f6;
-    max-width: fit-content;
     padding: 24px 16px;
-
-    &.active {
-        .range-dropdown-filter__header {
-            min-width: 430px;
-        }
+    max-width: fit-content;
+    .range-dropdown-filter__header {
+        min-width: 430px;
     }
+    &.active {
+    }
+
     th,
     td {
         border-bottom: 1px solid #f5f8f9;
@@ -175,6 +175,9 @@
         }
     }
     thead {
+        th:nth-child(2) {
+            padding: 10px 15px;
+        }
     }
     tbody {
         td {
@@ -182,6 +185,9 @@
                 text-align: center;
                 label {
                     cursor: pointer;
+
+                    justify-content: center;
+                    align-items: center;
                     input {
                         display: none;
                         appearance: none;
@@ -197,7 +203,8 @@
                     span {
                         position: relative;
                         padding-left: 20px;
-
+                        width: 12px;
+                        height: 12px;
                         &::after {
                             content: "";
                             position: absolute;
@@ -227,6 +234,9 @@
             }
         }
     }
+    .switch-btn::before {
+        top: 1.5px;
+    }
 }
 .screener {
     h1 {
@@ -247,6 +257,8 @@
         display: flex;
         gap: 24px 16px;
         align-items: flex-start;
+        position: relative;
+        z-index: 3;
         .multi-select {
             min-width: 235px;
             --rmsc-main: #eff2f6;
@@ -418,6 +430,7 @@
         margin-top: 20px;
         padding: 24px 12px;
         border: 1px solid rgba(58, 181, 74, 0.2);
+        margin-bottom: 32px;
 
         -webkit-overflow-scrolling: touch; /* Обеспечивает плавный скроллинг на iOS */
         scrollbar-width: thin; /* Устанавливает ширину скроллбара для Firefox */
@@ -644,6 +657,7 @@ label {
 /* Позиционирование внутреннего круга при включении переключателя */
 input[type="checkbox"]:checked + .switch-btn::before {
     transform: translateX(20px); /* Сдвигаем круг вправо при включении */
+    background: #fff;
 }
 @media only screen and (max-width: 1600px) {
     .table {
@@ -665,44 +679,19 @@ input[type="checkbox"]:checked + .switch-btn::before {
                     height: 28px;
                 }
             }
-
-            &.ytm,
-            &.tcd {
-                flex: 0 0 80px;
-                max-width: 80px;
-            }
-
-            &.term,
-            &.price {
-                flex: 0 0 100px;
-                max-width: 100px;
-            }
-
-            &.duration,
-            &.mSpread,
-            &.gSpread,
-            &.couponRate,
-            &.tradingVolumeLiquidity10Days,
-            &.tradingVolumeTodayRUB,
-            &.priceChangeDay,
-            &.ytmChangeDay,
-            &.couponFrequency {
-                flex: 0 0 120px;
-                max-width: 120px;
-            }
-
-            &.ratings,
-            &.currency {
-                flex: 0 0 140px;
-                max-width: 140px;
-            }
-
-            &.nominalPercentage,
-            &.qualifiedOnlyFlag,
-            &.couponFormula {
-                flex: 0 0 180px;
-                max-width: 180px;
-            }
+        }
+    }
+}
+@media only screen and (max-width: 1400px) {
+    .table {
+        td,
+        th {
+            font-size: rem(14px);
+        }
+    }
+    .screener {
+        h1 {
+            font-size: rem(24px);
         }
     }
 }
@@ -713,6 +702,7 @@ input[type="checkbox"]:checked + .switch-btn::before {
         &-row {
             gap: 12px;
             margin-bottom: 24px;
+            overscroll-behavior: contain;
         }
         .range-dropdown-filter,
         .multi-select {
@@ -725,18 +715,12 @@ input[type="checkbox"]:checked + .switch-btn::before {
             padding: 8px 16px;
             background: #eff2f6;
             flex: 1 1 auto;
+
+            h3 {
+                font-size: 14px;
+            }
         }
         &-popup {
-            position: fixed;
-            background: #fff;
-            border-radius: 24px;
-
-            inset: 0;
-
-            padding: 60px 15px 0px;
-            overscroll-behavior: contain;
-            z-index: 100;
-
             &-row {
                 display: flex;
                 flex-direction: column;
@@ -744,6 +728,10 @@ input[type="checkbox"]:checked + .switch-btn::before {
                 overscroll-behavior: contain;
                 overflow-y: auto;
                 max-height: 100vh;
+
+                .range-dropdown-filter {
+                    max-width: 100%;
+                }
             }
 
             .range-dropdown-filter__content {
@@ -804,14 +792,14 @@ input[type="checkbox"]:checked + .switch-btn::before {
 
             &.ytm,
             &.tcd {
-                flex: 0 0 60px;
-                max-width: 60px;
+                flex: 0 0 80px;
+                max-width: 80px;
             }
 
             &.term,
             &.price {
-                flex: 0 0 70px;
-                max-width: 70px;
+                flex: 0 0 100px;
+                max-width: 100px;
             }
 
             &.duration,
@@ -822,22 +810,22 @@ input[type="checkbox"]:checked + .switch-btn::before {
             &.tradingVolumeTodayRUB,
             &.priceChangeDay,
             &.ytmChangeDay,
-            &.currency,
             &.couponFrequency {
-                flex: 0 0 95px;
-                max-width: 95px;
+                flex: 0 0 120px;
+                max-width: 120px;
             }
 
-            &.ratings {
-                flex: 0 0 90px;
-                max-width: 90px;
+            &.ratings,
+            &.currency {
+                flex: 0 0 140px;
+                max-width: 140px;
             }
 
             &.nominalPercentage,
             &.qualifiedOnlyFlag,
             &.couponFormula {
-                flex: 0 0 130px;
-                max-width: 130px;
+                flex: 0 0 180px;
+                max-width: 180px;
             }
         }
         th {
@@ -866,6 +854,48 @@ input[type="checkbox"]:checked + .switch-btn::before {
     }
 }
 @media only screen and (max-width: 992px) {
+    .table {
+        th,
+        td {
+            &.ytm,
+            &.tcd {
+                flex: 0 0 80px;
+                max-width: 80px;
+            }
+
+            &.term,
+            &.price {
+                flex: 0 0 80px;
+                max-width: 80px;
+            }
+
+            &.duration,
+            &.mSpread,
+            &.gSpread,
+            &.couponRate,
+            &.tradingVolumeLiquidity10Days,
+            &.tradingVolumeTodayRUB,
+            &.priceChangeDay,
+            &.ytmChangeDay,
+            &.couponFrequency {
+                flex: 0 0 100px;
+                max-width: 100px;
+            }
+
+            &.ratings,
+            &.currency {
+                flex: 0 0 100px;
+                max-width: 100px;
+            }
+
+            &.nominalPercentage,
+            &.qualifiedOnlyFlag,
+            &.couponFormula {
+                flex: 0 0 180px;
+                max-width: 180px;
+            }
+        }
+    }
     .screener__filters-row {
         justify-content: space-between;
     }
@@ -875,8 +905,19 @@ input[type="checkbox"]:checked + .switch-btn::before {
     .screener .range-dropdown-filter.active {
         border-radius: 16px;
     }
+    .rating-table-container .range-dropdown-filter__header {
+        min-width: auto;
+    }
+    .screener {
+        h1 {
+            margin-left: 16px;
+        }
+    }
+    .screener .range-dropdown-filter__content {
+        position: static;
+    }
 }
-@media only screen and (max-width: 450px) {
+@media only screen and (max-width: 576px) {
     .screener__filters .range-dropdown-filter {
         min-width: auto;
     }

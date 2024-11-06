@@ -10,9 +10,13 @@ import BondTables from "./BondTables/BondTables";
 import BondChart from "./BondChart/BondChart";
 import BondLinks from "./BondLinks/BondLinks";
 
-export default function Bond() {
+export default function Bond({ bondDataProps }) {
   const isMobile = useOutletContext();
-  const bondData = useSelector((state) => state.bond.bonds[0]);
+  // Всегда вызываем useSelector для получения данных
+  const bondDataFromStore = useSelector((state) => state.bond.bonds[0]);
+
+  // Используем bondDataProps, если он передан, иначе используем данные из Redux
+  const bondData = bondDataProps || bondDataFromStore;
 
   return (
     <section className="bond">

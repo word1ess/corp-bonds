@@ -3,9 +3,12 @@ import { useTable, useSortBy } from "react-table";
 import { MultiSelect } from "react-multi-select-component";
 import { useSelector } from "react-redux";
 import CustomTooltip from "../../Common/CustomTooltip/CustomTooltip";
-import BondPopup from "../../Bond/BondPopup";
+import Bond from "../../Bond/Bond";
 import { useOutletContext } from "react-router-dom";
 import { useSticky } from "react-table-sticky";
+import { useRef } from "react";
+import { useEffect } from "react";
+import PopupLayout from "../../Common/PopupLayout/PopupLayout";
 
 // Редюсер для управления состоянием фильтров
 const filterReducer = (state, action) => {
@@ -25,7 +28,7 @@ const MultiSelectFilter = ({
   options,
   selectedValues,
   onChange,
-  selectionLimit = null,
+  selectionLimit = 1,
 }) => {
   const handleChange = (selected) => {
     if (selectionLimit && selected.length > selectionLimit) {
@@ -41,7 +44,6 @@ const MultiSelectFilter = ({
         value={selectedValues}
         onChange={handleChange}
         labelledBy={label}
-        selectionLimit={selectionLimit}
         overrideStrings={{
           selectSomeItems: label,
           allItemsAreSelected: "Все элементы выбраны",
@@ -61,12 +63,33 @@ const RangeDropdownFilter = ({
   isOpenProps = false,
 }) => {
   const [isOpen, setIsOpen] = useState(isOpenProps);
+  const dropdownRef = useRef();
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);
   };
 
+  // Эффект для закрытия дропдауна при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false); // Закрываем дропдаун
+      }
+    };
+
+    // Добавляем обработчик события клика
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Убираем обработчик при размонтировании компонента
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className={`range-dropdown-filter ${isOpen ? "active" : ""}`}>
+    <div
+      className={`range-dropdown-filter ${isOpen ? "active" : ""}`}
+      ref={dropdownRef}
+    >
       <div className="range-dropdown-filter__header" onClick={toggleDropdown}>
         <h3 style={{ cursor: "pointer" }}>{label}</h3>
         <svg
@@ -263,6 +286,7 @@ const RatingTable = ({
     </div>
   );
 };
+
 // Блок фильтров
 const ScreenerBlockFilters = ({
   filters,
@@ -282,7 +306,7 @@ const ScreenerBlockFilters = ({
     term: false,
     duration: false,
   };
-  const [isOpen, setIsOpen] = useState(false);
+  const [isPopupOpen, setIsOpen] = useState(false);
   const [isCurrent, setIsCurrent] = useState(defaultIsCurrent);
   const isMobile = useOutletContext();
 
@@ -306,7 +330,6 @@ const ScreenerBlockFilters = ({
   const handleApplyFilters = () => {
     setAppliedFilters(filters); // Применяем текущие фильтры
   };
-
   const handleResetFilters = () => {
     setAppliedFilters(initialFilters); // Сбрасываем фильтры к значениям по умолчанию
     setFilters({ type: "RESET_FILTER" }); // Сбрасываем редюсер фильтров
@@ -328,6 +351,60 @@ const ScreenerBlockFilters = ({
               type: "SET_FILTER",
               filter: "issuer",
               value: selected,
+            })
+          }
+        />
+        <RatingTable
+          selectedRatings={selectedRatings}
+          handleRatingChange={handleRatingChange}
+        />
+        <MultiSelectFilter
+          label="Тип бумаги"
+          options={uniqueValues("type")}
+          selectedValues={filters.type}
+          onChange={(selected) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "type",
+              value: selected,
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="Срок обращения"
+          minValue={filters.term.min}
+          maxValue={filters.term.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "term",
+              value: { ...filters.term, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "term",
+              value: { ...filters.term, max: value },
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="Дюрация"
+          minValue={filters.duration.min}
+          maxValue={filters.duration.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "duration",
+              value: { ...filters.duration, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "duration",
+              value: { ...filters.duration, max: value },
             })
           }
         />
@@ -369,60 +446,6 @@ const ScreenerBlockFilters = ({
             })
           }
         />
-        <RatingTable
-          selectedRatings={selectedRatings}
-          handleRatingChange={handleRatingChange}
-        />
-        <RangeDropdownFilter
-          label="Срок обращения"
-          minValue={filters.term.min}
-          maxValue={filters.term.max}
-          onMinChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "term",
-              value: { ...filters.term, min: value },
-            })
-          }
-          onMaxChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "term",
-              value: { ...filters.term, max: value },
-            })
-          }
-        />
-        <RangeDropdownFilter
-          label="Дюрация"
-          minValue={filters.duration.min}
-          maxValue={filters.duration.max}
-          onMinChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "duration",
-              value: { ...filters.duration, min: value },
-            })
-          }
-          onMaxChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "duration",
-              value: { ...filters.duration, max: value },
-            })
-          }
-        />
-        <MultiSelectFilter
-          label="Тип бумаги"
-          options={uniqueValues("type")}
-          selectedValues={filters.type}
-          onChange={(selected) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "type",
-              value: selected,
-            })
-          }
-        />
 
         {isOpenFilters && (
           <>
@@ -430,7 +453,7 @@ const ScreenerBlockFilters = ({
               label="G-спред"
               minValue={filters.gSpread.min}
               maxValue={filters.gSpread.max}
-              isOpenProps={isOpen && isCurrent}
+              isOpenProps={isPopupOpen && isCurrent}
               onMinChange={(value) =>
                 setFilters({
                   type: "SET_FILTER",
@@ -450,7 +473,7 @@ const ScreenerBlockFilters = ({
               label="Объем торгов за сегодня"
               minValue={filters.tradingVolumeTodayRUB.min}
               maxValue={filters.tradingVolumeTodayRUB.max}
-              isOpenProps={isOpen && isCurrent}
+              isOpenProps={isPopupOpen && isCurrent}
               onMinChange={(value) =>
                 setFilters({
                   type: "SET_FILTER",
@@ -471,7 +494,7 @@ const ScreenerBlockFilters = ({
               label="Частота купона"
               minValue={filters.couponFrequency.min}
               maxValue={filters.couponFrequency.max}
-              isOpenProps={isOpen && isCurrent}
+              isOpenProps={isPopupOpen && isCurrent}
               onMinChange={(value) =>
                 setFilters({
                   type: "SET_FILTER",
@@ -585,13 +608,13 @@ const ScreenerBlockFilters = ({
           </svg>
         </div>
 
-        {isOpen && (
-          <div className="screener__filters-popup">
+        {isPopupOpen && (
+          <PopupLayout
+            isPopupOpen={isPopupOpen}
+            handleCloseClick={handleCloseClick}
+          >
+            <h2 className="popup-title">Фильтры</h2>
             <div className="screener__filters-popup-row">
-              <button
-                className="popup-close"
-                onClick={handleCloseClick}
-              ></button>
               <RangeDropdownFilter
                 label="YTM"
                 minValue={filters.ytm.min}
@@ -753,7 +776,7 @@ const ScreenerBlockFilters = ({
                 }
               />
             </div>
-          </div>
+          </PopupLayout>
         )}
       </>
     );
@@ -836,6 +859,7 @@ const ScreenerBlockFilters = ({
     </header>
   );
 };
+
 // Таблица
 const DataTable = ({ data, columns, onRowClick }) => {
   // Настройка таблицы с использованием react-table
@@ -1331,10 +1355,8 @@ const TableComponent = () => {
   };
   // Открытие попапа
   const handleRowClick = (index) => {
-    console.log(index);
     setSelectedBond(bondState.bonds[index]); // Устанавливаем данные выбранной облигации
-    setIsPopupOpen(true); // Открываем попап
-    document.querySelector(".header").classList.add("popup-open");
+    setIsPopupOpen(true);
   };
   // Закрытие попапа
   const handleCloseClick = () => {
@@ -1500,31 +1522,12 @@ const TableComponent = () => {
       />
       {/* Попап с информацией о выбранной облигации */}
       {isPopupOpen && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <div className="popup-close" onClick={handleCloseClick}>
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5.63672 6L18.3646 18.7279"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                />
-                <path
-                  d="M5.63672 19L18.3646 6.27208"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </div>
-            <BondPopup bondData={selectedBond} onClose={handleCloseClick} />
-          </div>
-        </div>
+        <PopupLayout
+          isPopupOpen={isPopupOpen}
+          handleCloseClick={handleCloseClick}
+        >
+          <Bond bondDataProps={selectedBond} />
+        </PopupLayout>
       )}
     </>
   );
