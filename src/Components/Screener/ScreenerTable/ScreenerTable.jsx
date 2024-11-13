@@ -1,14 +1,27 @@
-import React, { useMemo, useReducer, useState } from "react";
-import { useTable, useSortBy } from "react-table";
-import { MultiSelect } from "react-multi-select-component";
-import { useSelector } from "react-redux";
-import CustomTooltip from "../../Common/CustomTooltip/CustomTooltip";
-import Bond from "../../Bond/Bond";
+import React, {
+  useMemo,
+  useReducer,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
 import { useOutletContext } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useTable, useSortBy } from "react-table";
 import { useSticky } from "react-table-sticky";
-import { useRef } from "react";
-import { useEffect } from "react";
+import { MultiSelect } from "react-multi-select-component";
+
+import Bond from "../../Bond/Bond";
+import CustomTooltip from "../../Common/CustomTooltip/CustomTooltip";
 import PopupLayout from "../../Common/PopupLayout/PopupLayout";
+
+import { bondsApi } from "../../../api/api";
+import {
+  setBondHeader,
+  setBondPay,
+  setBondActions,
+} from "../../../redux/bonds";
 
 // Редюсер для управления состоянием фильтров
 const filterReducer = (state, action) => {
@@ -29,6 +42,7 @@ const MultiSelectFilter = ({
   selectedValues,
   onChange,
   selectionLimit = 1,
+  showSearch = false,
 }) => {
   const handleChange = (selected) => {
     if (selectionLimit && selected.length > selectionLimit) {
@@ -44,6 +58,7 @@ const MultiSelectFilter = ({
         value={selectedValues}
         onChange={handleChange}
         labelledBy={label}
+        search={false}
         overrideStrings={{
           selectSomeItems: label,
           allItemsAreSelected: "Все элементы выбраны",
@@ -75,10 +90,8 @@ const RangeDropdownFilter = ({
         setIsOpen(false); // Закрываем дропдаун
       }
     };
-
     // Добавляем обработчик события клика
     document.addEventListener("mousedown", handleClickOutside);
-
     // Убираем обработчик при размонтировании компонента
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -105,21 +118,23 @@ const RangeDropdownFilter = ({
       </div>
       {isOpen && (
         <div className="range-dropdown-filter__content">
-          <p>Укажите {label.toLowerCase()} от и до</p>
-          <div className="range-dropdown-filter__row">
-            <input
-              type="number"
-              placeholder="От"
-              value={minValue}
-              onChange={(e) => onMinChange(e.target.value)}
-            />
-            <p>-</p>
-            <input
-              type="number"
-              placeholder="До"
-              value={maxValue}
-              onChange={(e) => onMaxChange(e.target.value)}
-            />
+          <div onClick={(e) => e.stopPropagation()}>
+            <p>Укажите {label.toLowerCase()} от и до</p>
+            <div className="range-dropdown-filter__row">
+              <input
+                type="number"
+                placeholder="От"
+                value={minValue}
+                onChange={(e) => onMinChange(e.target.value)}
+              />
+              <p>-</p>
+              <input
+                type="number"
+                placeholder="До"
+                value={maxValue}
+                onChange={(e) => onMaxChange(e.target.value)}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -242,9 +257,11 @@ const RatingTable = ({
           <path d="M6 9L12 15 18 9"></path>
         </svg>
       </div>
-
       {isOpen && (
-        <div className="range-dropdown-filter__content">
+        <div
+          className="range-dropdown-filter__content"
+          onClick={(e) => e.stopPropagation()}
+        >
           <header className="range-dropdown-filter__description">
             Нажмите <button className="switch-btn"></button>, чтобы выбрать все
             значения в строке ( рейтинг у всех агентств)
@@ -298,6 +315,7 @@ const ScreenerBlockFilters = ({
   searchTerm,
   setSearchTerm,
   selectedRatings,
+  isMobile,
 }) => {
   const defaultIsCurrent = {
     ytm: false,
@@ -308,7 +326,6 @@ const ScreenerBlockFilters = ({
   };
   const [isPopupOpen, setIsOpen] = useState(false);
   const [isCurrent, setIsCurrent] = useState(defaultIsCurrent);
-  const isMobile = useOutletContext();
 
   const toggleDropdown = (current) => {
     setIsCurrent(() => {
@@ -325,6 +342,7 @@ const ScreenerBlockFilters = ({
     setIsOpen(false);
     document.querySelector(".header").classList.remove("popup-open");
   };
+
   // Уникальные значения для фильтров
   const uniqueValues = (key) => [...new Set(data.map((item) => item[key]))];
   const handleApplyFilters = () => {
@@ -353,10 +371,23 @@ const ScreenerBlockFilters = ({
               value: selected,
             })
           }
+          showSearch
         />
         <RatingTable
           selectedRatings={selectedRatings}
           handleRatingChange={handleRatingChange}
+        />
+        <MultiSelectFilter
+          label="Сектор рынка"
+          options={uniqueValues("sector")}
+          selectedValues={filters.sector}
+          onChange={(selected) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "sector",
+              value: selected,
+            })
+          }
         />
         <MultiSelectFilter
           label="Тип бумаги"
@@ -409,7 +440,7 @@ const ScreenerBlockFilters = ({
           }
         />
         <RangeDropdownFilter
-          label="YTM"
+          label="Уровень ликвидности"
           minValue={filters.ytm.min}
           maxValue={filters.ytm.max}
           onMinChange={(value) =>
@@ -446,6 +477,138 @@ const ScreenerBlockFilters = ({
             })
           }
         />
+        <RangeDropdownFilter
+          label="Дневной оборот"
+          minValue={filters.mSpread.min}
+          maxValue={filters.mSpread.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "mSpread",
+              value: { ...filters.mSpread, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "mSpread",
+              value: { ...filters.mSpread, max: value },
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="Уровень листинга"
+          minValue={filters.listingLevel.min}
+          maxValue={filters.listingLevel.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "listingLevel",
+              value: { ...filters.listingLevel, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "listingLevel",
+              value: { ...filters.listingLevel, max: value },
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="Уровень ликвидности"
+          minValue={filters.liquidityLevel.min}
+          maxValue={filters.liquidityLevel.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "liquidityLevel",
+              value: { ...filters.liquidityLevel, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "liquidityLevel",
+              value: { ...filters.liquidityLevel, max: value },
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="Объем в текущую сессию"
+          minValue={filters.tradingVolumeSession.min}
+          maxValue={filters.tradingVolumeSession.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "tradingVolumeSession",
+              value: { ...filters.tradingVolumeSession, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "tradingVolumeSession",
+              value: { ...filters.tradingVolumeSession, max: value },
+            })
+          }
+        />
+        <RangeDropdownFilter
+          label="Изменение цены к вчера"
+          minValue={filters.changePriceToTommorow.min}
+          maxValue={filters.changePriceToTommorow.max}
+          onMinChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "changePriceToTommorow",
+              value: { ...filters.changePriceToTommorow, min: value },
+            })
+          }
+          onMaxChange={(value) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "changePriceToTommorow",
+              value: { ...filters.changePriceToTommorow, max: value },
+            })
+          }
+        />
+
+        <MultiSelectFilter
+          label="Валюта"
+          options={uniqueValues("currency")}
+          selectedValues={filters.currency}
+          onChange={(selected) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "currency",
+              value: selected,
+            })
+          }
+        />
+        <MultiSelectFilter
+          label="Отрасль"
+          options={uniqueValues("branch")}
+          selectedValues={filters.branch}
+          onChange={(selected) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "branch",
+              value: selected,
+            })
+          }
+        />
+        <MultiSelectFilter
+          label="Ограничения"
+          options={uniqueValues("qualifiedOnlyFlag")}
+          selectedValues={filters.qualifiedOnlyFlag}
+          onChange={(selected) =>
+            setFilters({
+              type: "SET_FILTER",
+              filter: "qualifiedOnlyFlag",
+              value: selected,
+            })
+          }
+        />
 
         {isOpenFilters && (
           <>
@@ -466,26 +629,6 @@ const ScreenerBlockFilters = ({
                   type: "SET_FILTER",
                   filter: "gSpread",
                   value: { ...filters.gSpread, max: value },
-                })
-              }
-            />
-            <RangeDropdownFilter
-              label="Объем торгов за сегодня"
-              minValue={filters.tradingVolumeTodayRUB.min}
-              maxValue={filters.tradingVolumeTodayRUB.max}
-              isOpenProps={isPopupOpen && isCurrent}
-              onMinChange={(value) =>
-                setFilters({
-                  type: "SET_FILTER",
-                  filter: "tradingVolumeTodayRUB",
-                  value: { ...filters.tradingVolumeTodayRUB, min: value },
-                })
-              }
-              onMaxChange={(value) =>
-                setFilters({
-                  type: "SET_FILTER",
-                  filter: "tradingVolumeTodayRUB",
-                  value: { ...filters.tradingVolumeTodayRUB, max: value },
                 })
               }
             />
@@ -711,6 +854,7 @@ const ScreenerBlockFilters = ({
                     value: selected,
                   })
                 }
+                showSearch
               />
               <RangeDropdownFilter
                 label="Объем торгов за сегодня"
@@ -781,17 +925,93 @@ const ScreenerBlockFilters = ({
       </>
     );
   };
+  const ScreenerBlockSearch = ({}) => {
+    const [localSearchTerm, setLocalSearchTerm] = useState("");
+    const [isFocused, setIsFocused] = useState(false);
 
-  return (
-    <header className="screener__block">
+    const inputRef = useRef();
+    const filteredSuggestionsRef = useRef([]); // Храним список подсказок в ref
+
+    useEffect(() => {
+      const handleBlur = () => {
+        setIsFocused(false);
+      };
+
+      const handleFocus = () => {
+        setIsFocused(true);
+      };
+
+      inputRef.current.addEventListener("blur", handleBlur);
+      inputRef.current.addEventListener("focus", handleFocus);
+
+      return () => {
+        if (inputRef.current) {
+          inputRef.current.removeEventListener("blur", handleBlur);
+          inputRef.current.removeEventListener("focus", handleFocus);
+        }
+      };
+    }, []);
+
+    const handleInputChange = useCallback(
+      (event) => {
+        const value = event.target.value;
+        setLocalSearchTerm(value);
+        // Фильтрация данных с помощью useMemo
+        const filteredSuggestions = value
+          ? data.filter((item) =>
+              item.title.toLowerCase().includes(value.toLowerCase())
+            )
+          : [];
+        filteredSuggestionsRef.current = filteredSuggestions;
+        // Возвращаем фокус на инпут
+        requestAnimationFrame(() => {
+          inputRef.current.focus();
+        });
+      },
+      [data]
+    );
+
+    const handleSuggestionClick = (title) => {
+      setSearchTerm(title);
+      setLocalSearchTerm(title);
+      filteredSuggestionsRef.current = []; // Очищаем ref
+
+      inputRef.current.value = searchTerm;
+    };
+
+    return (
       <div className="search">
         <input
           type="text"
           placeholder="Поиск по названию или ISIN"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={handleInputChange}
+          ref={inputRef}
+          value={localSearchTerm}
         />
+        <button onClick={(e) => setSearchTerm(inputRef.current.value)}>
+          Искать
+        </button>
+        {isFocused && filteredSuggestionsRef.current.length > 0 && (
+          <ul className="search__tip">
+            {filteredSuggestionsRef.current
+              .slice(0, 7)
+              .map((suggestion, index) => (
+                <li
+                  key={index}
+                  onMouseDown={() => handleSuggestionClick(suggestion.title)}
+                >
+                  {suggestion.title}
+                </li>
+              ))}
+          </ul>
+        )}
       </div>
+    );
+  };
+
+  return (
+    <header className="screener__block">
+      <ScreenerBlockSearch />
       <div className="screener__filters">
         <div className="screener__filters-row">
           {isMobile ? (
@@ -1010,7 +1230,10 @@ const DataTable = ({ data, columns, onRowClick }) => {
           {rows.map((row, i) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()} onClick={() => onRowClick(i)}>
+              <tr
+                {...row.getRowProps()}
+                onClick={() => onRowClick(row.original.isin)}
+              >
                 {row.cells.map((cell, i) => (
                   <td className={cell.column.id} {...cell.getCellProps()}>
                     {cell.column.id === "ratings" ? (
@@ -1061,54 +1284,24 @@ const DataTable = ({ data, columns, onRowClick }) => {
 // Мейн компонент
 // Вся логика для таблицы
 const TableComponent = () => {
-  const defaultVisibility = {
-    visibility: {
-      term: true,
-      duration: true,
-      ratings: true,
-      ytm: true,
-      mSpread: true,
-      gSpread: true,
-      price: false,
-      nominalPercentage: false,
-      tcd: false,
-      couponRate: false,
-      tradingVolumeLiquidity10Days: false,
-      tradingVolumeTodayRUB: false,
-      priceChangeDay: false,
-      ytmChangeDay: false,
-      qualifiedOnlyFlag: false,
-      currency: false,
-      couponFormula: false,
-      zSpread: false,
-      couponFrequency: false,
-    },
-    titles: {
-      term: "Срок, лет",
-      duration: "Дюрация, %",
-      ratings: "Кредитный рейтинг",
-      ytm: "YTM",
-      mSpread: "М-спред",
-      gSpread: "G-спред",
-      price: "Цена",
-      nominalPercentage: "% от номинала",
-      tcd: "ТКД",
-      couponRate: "Ставка купона",
-      tradingVolumeLiquidity10Days: "Объем торгов",
-      tradingVolumeTodayRUB: "Объем торгов (сегодня)",
-      priceChangeDay: "Изменение цены за день",
-      ytmChangeDay: "Изменение YTM за день",
-      qualifiedOnlyFlag: "Признак «только для квалов»",
-      currency: "Валюта инструмента",
-      couponFormula: "Формула купона",
-      zSpread: "Z-спрэд",
-      couponFrequency: "Частота купона",
-    },
-  };
+  const isMobile = useOutletContext();
+  const dispatchRedux = useDispatch();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Состояние для выбранных рейтингов
+  const [selectedRatings, setSelectedRatings] = useState({});
+
+  // Запрос данных из таблицы
+  const bondState = useSelector((state) => state.bond);
+  // Данные для таблицы
+  const data = useMemo(
+    () => bondState.bondReactTables,
+    [bondState.bondReactTables]
+  );
+  // Инициализация типов фильтров
   const initialFilters = {
     issuer: [],
     rating: [],
-    type: [],
     term: { min: "", max: "" },
     duration: { min: "", max: "" },
     ytm: { min: "", max: "" },
@@ -1122,31 +1315,25 @@ const TableComponent = () => {
     tradingVolumeTodayRUB: { min: "", max: "" },
     priceChangeDay: { min: "", max: "" },
     ytmChangeDay: "",
-    qualifiedOnlyFlag: "",
-    currency: "",
+    qualifiedOnlyFlag: [],
+    currency: [],
     couponFormula: "",
     zSpread: "",
     couponFrequency: "",
+
+    type: [],
+    sector: [],
+    liquidityLevel: { min: "", max: "" },
+
+    tradingVolumeSession: { min: "", max: "" },
+    branch: [],
+    changePriceToTommorow: { min: "", max: "" },
+    listingLevel: { min: "", max: "" },
   };
-  const [selectedBond, setSelectedBond] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [columnVisibility, setColumnVisibility] = useState(
-    defaultVisibility.visibility
-  );
   // Состояние для примененных фильтров
   const [appliedFilters, setAppliedFilters] = useState(initialFilters);
-  // Состояние для выбранных рейтингов
-  const [selectedRatings, setSelectedRatings] = useState({});
+  // Состояние для самих фильтров
   const [filters, dispatch] = useReducer(filterReducer, initialFilters);
-  // Запрос данных из таблицы
-  const bondState = useSelector((state) => state.bond);
-  // Данные для таблицы
-  const data = useMemo(
-    () => bondState.bondReactTables,
-    [bondState.bondReactTables]
-  );
   // Фильтрация данных
   const filteredData = useMemo(() => {
     return data.filter((item) => {
@@ -1196,6 +1383,143 @@ const TableComponent = () => {
     });
   }, [data, selectedRatings, appliedFilters, searchTerm]); // Добавляем selectedRatings и filters в зависимости
 
+  const handleRatingChange = (type, data) => {
+    setSelectedRatings((prev) => {
+      const updatedRatings = { ...prev };
+      // Функция для установки состояния агентств
+      const setRatings = (rating, agency) => {
+        if (agency) {
+          // Если агентство выбрано, добавляем его
+          if (!updatedRatings[rating]) {
+            updatedRatings[rating] = {};
+          }
+          // Переключаем состояние агентства
+          updatedRatings[rating][agency] = !updatedRatings[rating][agency];
+        }
+
+        // Удаляем рейтинг, если все агентства сняты
+        if (
+          updatedRatings[rating] &&
+          Object.values(updatedRatings[rating]).every((val) => !val)
+        ) {
+          delete updatedRatings[rating];
+        }
+      };
+
+      // Обработка одиночного выбора
+      if (type === "single") {
+        setRatings(...data);
+      }
+
+      // Обработка множественного выбора
+      if (type === "multy") {
+        const { rating, newSelection } = data;
+
+        // Обновляем состояние для каждого агентства
+        Object.keys(newSelection).forEach((agency) => {
+          if (!updatedRatings[rating]) {
+            updatedRatings[rating] = {};
+          }
+          updatedRatings[rating][agency] = newSelection[agency]; // Устанавливаем состояние на основе newSelection
+        });
+
+        // Удаляем рейтинг, если все агентства сняты
+        if (
+          updatedRatings[rating] &&
+          Object.values(updatedRatings[rating]).every((val) => !val)
+        ) {
+          delete updatedRatings[rating];
+        }
+      }
+
+      return updatedRatings; // Возвращаем обновленное состояние
+    });
+  };
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  // Открытие попапа
+  const handleRowClick = async (isin) => {
+    try {
+      const data = await bondsApi.getBondsInfo(isin);
+      dispatchRedux(setBondHeader(data.bondHeader));
+      dispatchRedux(setBondPay(data.bondPay));
+      // dispatchRedux(setBondActions(data.bondActions));
+
+      setIsPopupOpen(true);
+    } catch (err) {
+      console.log(err.message || "Ошибка при загрузке данных");
+    }
+  };
+  // Закрытие попапа
+  const handleCloseClick = () => {
+    setIsPopupOpen(false);
+    document.querySelector(".header").classList.remove("popup-open");
+  };
+
+  const defaultVisibility = {
+    visibility: {
+      term: true,
+      duration: true,
+      ratings: true,
+      ytm: true,
+      mSpread: true,
+      gSpread: true,
+      price: false,
+      nominalPercentage: false,
+      tcd: false,
+      couponRate: false,
+      tradingVolumeLiquidity10Days: false,
+      tradingVolumeTodayRUB: false,
+      priceChangeDay: false,
+      ytmChangeDay: false,
+      qualifiedOnlyFlag: false,
+      currency: false,
+      couponFormula: false,
+      zSpread: false,
+      couponFrequency: false,
+
+      sector: false,
+      type: false,
+
+      tradingVolumeSession: false,
+      branch: false,
+      changePriceToTommorow: false,
+      listingLevel: false,
+    },
+    titles: {
+      term: "Срок, лет",
+      duration: "Дюрация, %",
+      ratings: "Кредитный рейтинг",
+      ytm: "YTM",
+      mSpread: "М-спред",
+      gSpread: "G-спред",
+      price: "Цена",
+      nominalPercentage: "% от номинала",
+      tcd: "ТКД",
+      couponRate: "Ставка купона",
+      tradingVolumeLiquidity10Days: "Объем торгов",
+      tradingVolumeTodayRUB: "Дневной оборот",
+      priceChangeDay: "Изменение цены за день",
+      ytmChangeDay: "Изменение YTM за день",
+      qualifiedOnlyFlag: "Ограничения",
+      currency: "Валюта инструмента",
+      couponFormula: "Формула купона",
+      zSpread: "Z-спрэд",
+      couponFrequency: "Частота купона",
+
+      sector: "Сектор торгов",
+      type: "Тип бумаги",
+      tradingVolumeSession: "Объем торгов за сегодня",
+      branch: "Отрасль",
+      changePriceToTommorow: "Изменение цены к вчера",
+
+      listingLevel: "Уровень листинга",
+    },
+  };
+  const [columnVisibility, setColumnVisibility] = useState(
+    defaultVisibility.visibility
+  );
+  const [showSettings, setShowSettings] = useState(false);
   // Определение колонок таблицы в нужном порядке
   const columns = useMemo(() => {
     const cols = [
@@ -1257,7 +1581,7 @@ const TableComponent = () => {
         showColumn: columnVisibility.tradingVolumeLiquidity10Days,
       },
       {
-        Header: "Объем торгов (сегодня)",
+        Header: "Дневной оборот",
         accessor: "tradingVolumeTodayRUB",
         showColumn: columnVisibility.tradingVolumeTodayRUB,
       },
@@ -1296,74 +1620,44 @@ const TableComponent = () => {
         accessor: "couponFrequency",
         showColumn: columnVisibility.couponFrequency,
       },
+      {
+        Header: "Тип бумаги",
+        accessor: "type",
+        showColumn: columnVisibility.type,
+      },
+      {
+        Header: "Сектор торгов",
+        accessor: "sector",
+        showColumn: columnVisibility.sector,
+      },
+
+      {
+        Header: "Объем торгов за сегодня",
+        accessor: "tradingVolumeSession",
+        showColumn: columnVisibility.tradingVolumeSession,
+      },
+
+      {
+        Header: "Отрасль",
+        accessor: "branch",
+        showColumn: columnVisibility.branch,
+      },
+
+      {
+        Header: "Изменение цены к вчера",
+        accessor: "changePriceToTommorow",
+        showColumn: columnVisibility.changePriceToTommorow,
+      },
+
+      {
+        Header: "Уровень листинга",
+        accessor: "listingLevel",
+        showColumn: columnVisibility.listingLevel,
+      },
     ];
 
     return cols.filter((col) => col.showColumn !== false); // Фильтруем колонки по видимости
   }, [defaultVisibility.visibility]);
-
-  const handleRatingChange = (type, data) => {
-    setSelectedRatings((prev) => {
-      const updatedRatings = { ...prev };
-      // Функция для установки состояния агентств
-      const setRatings = (rating, agency) => {
-        if (agency) {
-          // Если агентство выбрано, добавляем его
-          if (!updatedRatings[rating]) {
-            updatedRatings[rating] = {};
-          }
-          // Переключаем состояние агентства
-          updatedRatings[rating][agency] = !updatedRatings[rating][agency];
-        }
-
-        // Удаляем рейтинг, если все агентства сняты
-        if (
-          updatedRatings[rating] &&
-          Object.values(updatedRatings[rating]).every((val) => !val)
-        ) {
-          delete updatedRatings[rating];
-        }
-      };
-
-      // Обработка одиночного выбора
-      if (type === "single") {
-        setRatings(...data);
-      }
-
-      // Обработка множественного выбора
-      if (type === "multy") {
-        const { rating, newSelection } = data;
-
-        // Обновляем состояние для каждого агентства
-        Object.keys(newSelection).forEach((agency) => {
-          if (!updatedRatings[rating]) {
-            updatedRatings[rating] = {};
-          }
-          updatedRatings[rating][agency] = newSelection[agency]; // Устанавливаем состояние на основе newSelection
-        });
-
-        // Удаляем рейтинг, если все агентства сняты
-        if (
-          updatedRatings[rating] &&
-          Object.values(updatedRatings[rating]).every((val) => !val)
-        ) {
-          delete updatedRatings[rating];
-        }
-      }
-
-      return updatedRatings; // Возвращаем обновленное состояние
-    });
-  };
-  // Открытие попапа
-  const handleRowClick = (index) => {
-    setSelectedBond(bondState.bonds[index]); // Устанавливаем данные выбранной облигации
-    setIsPopupOpen(true);
-  };
-  // Закрытие попапа
-  const handleCloseClick = () => {
-    setSelectedBond(null);
-    setIsPopupOpen(false);
-    document.querySelector(".header").classList.remove("popup-open");
-  };
 
   // Функция для сброса видимости колонок к значениям по умолчанию
   const resetColumnVisibility = () => {
@@ -1389,6 +1683,7 @@ const TableComponent = () => {
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         selectedRatings={selectedRatings}
+        isMobile={isMobile}
       />
       <div className="screener__btns">
         <button onClick={() => setShowSettings((prev) => !prev)}>
@@ -1519,6 +1814,7 @@ const TableComponent = () => {
         data={filteredData}
         columns={columns}
         onRowClick={handleRowClick}
+        isMobile={isMobile}
       />
       {/* Попап с информацией о выбранной облигации */}
       {isPopupOpen && (
@@ -1526,7 +1822,7 @@ const TableComponent = () => {
           isPopupOpen={isPopupOpen}
           handleCloseClick={handleCloseClick}
         >
-          <Bond bondDataProps={selectedBond} />
+          <Bond />
         </PopupLayout>
       )}
     </>

@@ -7,7 +7,7 @@ import CustomLinkArrow from "../../Common/LinkWithArrow/LinkWithArrow";
 export default function BondHeader({ bondHeader, isMobile }) {
   const liquiditySteps = Array(4)
     .fill(false)
-    .fill(true, 0, bondHeader.liquidity.stage);
+    .fill(true, 0, bondHeader.liquidityLevel);
 
   function BondBigCardHeader({ bondHeader, isMobile }) {
     if (isMobile) {
@@ -18,14 +18,14 @@ export default function BondHeader({ bondHeader, isMobile }) {
               <img src={bondImg} alt="bondImg" />
             </div>
             <div>
-              <h1>{bondHeader.name}</h1>
-              <h2>{bondHeader.code}</h2>
+              <h1>{bondHeader.fullName}</h1>
+              <h2>{bondHeader.isin}</h2>
               <div className="bond-big-card__emitent">
                 <p>Эмитент:</p>
 
                 <CustomLinkArrow
-                  text={bondHeader.emitent.text}
-                  link={bondHeader.emitent.link}
+                  text={bondHeader.issuerName}
+                  link={bondHeader.issuerLink}
                 />
               </div>
             </div>
@@ -40,7 +40,7 @@ export default function BondHeader({ bondHeader, isMobile }) {
               })}
             </div>
             <CustomTooltip parent="liquidity" place="top" />
-            <p>{bondHeader.liquidity.moneyInDay}</p>
+            <p>({bondHeader.liquidity.liquidityQuantity} руб / день) </p>
           </div>
         </>
       );
@@ -51,14 +51,14 @@ export default function BondHeader({ bondHeader, isMobile }) {
           <img src={bondImg} alt="bondImg" />
         </div>
         <div>
-          <h1>{bondHeader.name}</h1>
-          <h2>{bondHeader.code}</h2>
+          <h1>{bondHeader.fullName}</h1>
+          <h2>{bondHeader.isin}</h2>
           <div className="bond-big-card__emitent">
             <p>Эмитент:</p>
 
             <CustomLinkArrow
-              text={bondHeader.emitent.text}
-              link={bondHeader.emitent.link}
+              text={bondHeader.issuerName}
+              link={bondHeader.issuerLink}
             />
           </div>
           <div className="bond-big-card__liquidity">
@@ -71,7 +71,7 @@ export default function BondHeader({ bondHeader, isMobile }) {
               })}
             </div>
             <CustomTooltip parent="liquidity" place="top" />
-            <p>{bondHeader.liquidity.moneyInDay}</p>
+            <p>({bondHeader.liquidityQuantity} / руб в день)</p>
           </div>
         </div>
       </header>
@@ -292,26 +292,35 @@ export default function BondHeader({ bondHeader, isMobile }) {
         />
       </section>
       <main className="bond-cards">
-        <BondCard title="YTM" body={bondHeader.ytm} />
+        <BondCard
+          title="YTM"
+          body={{
+            yeld: `${bondHeader.yield} %`,
+            yieldDate: `к дате ${bondHeader.yieldDate}`,
+          }}
+        />
         <BondCard
           title="М спред"
-          body={bondHeader.spreds.m}
-          isTextGreen={true}
+          body={bondHeader.mSpread === null ? "-" : `${bondHeader.mSpread} %`}
+          isTextGreen={bondHeader.mSpread && true}
         />
         <BondCard
           title="G спред"
-          body={bondHeader.spreds.g}
-          isTextGreen={true}
+          body={bondHeader.gSpread === null ? "-" : `${bondHeader.gSpread} %`}
+          isTextGreen={bondHeader.gSpread && true}
         />
         <BondCard
           title="Цена"
-          body={bondHeader.price}
+          body={[`${bondHeader.priceChange} %`, `${bondHeader.lastPrice} руб`]}
           additionalClass="text-big"
         />
-        <BondCard title="Срок, лет" body={bondHeader.years.term} />
-        <BondCard title="Дюрация, лет" body={bondHeader.years.duration} />
-        <BondCard title="Рейтинг" body={bondHeader.rating} />
-        <BondCard title="Тип" body={bondHeader.type} />
+        <BondCard title="Срок, лет" body={bondHeader.maturityPeriod} />
+        <BondCard title="Дюрация, лет" body={bondHeader.duration} />
+        <BondCard title="Рейтинг" body={bondHeader.ratings} />
+        <BondCard
+          title="Тип"
+          body={[bondHeader.marketSectorName, bondHeader.couponTypeName]}
+        />
       </main>
     </header>
   );

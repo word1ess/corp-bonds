@@ -37,6 +37,7 @@
     }
     tr {
         display: flex;
+        justify-content: space-between;
     }
     td,
     th {
@@ -283,64 +284,6 @@
                     color: #121213;
                 }
 
-                & > div {
-                    position: relative;
-
-                    cursor: pointer;
-                    margin-bottom: 18px;
-                    .search {
-                        background: #fff;
-                        margin-bottom: 10px;
-                        margin: 0px 10px 10px;
-                        & input {
-                            background: #fff;
-                        }
-                    }
-                    .options input {
-                        display: none;
-                        appearance: none;
-
-                        &:checked + span::after {
-                            opacity: 1;
-                        }
-                        &:checked + span::before {
-                            opacity: 1;
-                            border: 2px solid #fff;
-                        }
-                    }
-                    .options {
-                        padding: 0px 10px;
-                    }
-                    span {
-                        position: relative;
-                        padding-left: 20px;
-
-                        &::after {
-                            content: "";
-                            position: absolute;
-
-                            opacity: 0;
-                            background: #47cb8f;
-                            width: 8px;
-                            height: 8px;
-                            left: 2px;
-                            top: 1.5px;
-                            z-index: 2;
-                            transition: all 300ms ease;
-                        }
-                        &::before {
-                            content: "";
-                            position: absolute;
-                            border: 1px solid #647383;
-                            border-radius: 2px;
-                            width: 12px;
-                            height: 12px;
-                            left: 0;
-                            top: -1px;
-                            z-index: 1;
-                        }
-                    }
-                }
                 .checkbox {
                     &:hover p::before {
                         border: 1px solid #e5e4e7;
@@ -368,7 +311,76 @@
                         color: #0b05048c;
                     }
                 }
-                .custom-checkbox {
+                .select-panel {
+                    display: flex;
+                    flex-direction: column;
+                    padding: 8px;
+                    position: relative;
+
+                    cursor: pointer;
+
+                    .search {
+                        background: #fff;
+                        margin: 0px;
+                        border-radius: 8px;
+                        overflow: hidden;
+                        & input {
+                            background: #fff;
+                        }
+                    }
+                    .options {
+                        margin-top: 10px;
+                        input {
+                            display: none;
+                            appearance: none;
+                        }
+                    }
+                }
+            }
+        }
+        .multi-select-filter:not(:first-child) {
+            .search {
+                display: none;
+            }
+            .options {
+                margin-top: 0px;
+                input {
+                    &:checked + span::after {
+                        opacity: 1;
+                    }
+                    &:checked + span::before {
+                        opacity: 1;
+                        border: 2px solid #fff;
+                    }
+                }
+                span {
+                    position: relative;
+                    padding-left: 20px;
+
+                    &::after {
+                        content: "";
+                        position: absolute;
+
+                        opacity: 0;
+                        background: #47cb8f;
+                        width: 8px;
+                        height: 8px;
+                        left: 2px;
+                        top: 1.5px;
+                        z-index: 2;
+                        transition: all 300ms ease;
+                    }
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        border: 1px solid #647383;
+                        border-radius: 2px;
+                        width: 12px;
+                        height: 12px;
+                        left: 0;
+                        top: -1px;
+                        z-index: 1;
+                    }
                 }
             }
         }
@@ -522,7 +534,7 @@
                 border-radius: 8px;
                 width: 91px;
                 height: 32px;
-                background: #f5f8f9;
+                background: #fff;
                 font-weight: 400;
                 font-size: 12px;
                 letter-spacing: -0.01em;
@@ -579,80 +591,6 @@
         flex: 0 0 300px;
     }
 }
-.search {
-    width: 100%;
-    margin-bottom: 28px;
-
-    & input {
-        display: block;
-        background: #f5f8f9;
-        border-radius: 16px;
-        padding: 14px 24px;
-        font-weight: 400;
-        font-size: 16px;
-        letter-spacing: -0.01em;
-        color: #8599b1;
-        width: 100%;
-    }
-}
-label {
-    font-weight: 400;
-    font-size: 16px;
-    letter-spacing: -0.01em;
-    color: #373f48;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-
-    & > input {
-        &[type="checkbox"] {
-            appearance: none; /* Убираем стандартный стиль */
-            width: 32px; /* Ширина переключателя */
-            height: 16px; /* Высота переключателя */
-        }
-        &[type="checkbox"]:checked + .switch-btn {
-            background-color: #47cb8f; /* Цвет фона при включении */
-        }
-        /* Позиционирование внутреннего круга при включении переключателя */
-        &[type="checkbox"]:checked + .switch-btn::before {
-            transform: translateX(14px); /* Сдвигаем круг вправо при включении */
-        }
-    }
-    & > button.switch-btn {
-        margin-left: 10px;
-        &.active {
-            transition: all 300ms ease;
-            background-color: #47cb8f; /* Цвет фона при включении */
-            &::before {
-                background: #fff;
-                transform: translateX(14px); /* Сдвигаем круг вправо при включении */
-            }
-        }
-    }
-}
-
-.switch-btn {
-    width: 32px; /* Ширина переключателя */
-    height: 16px; /* Высота переключателя */
-    background: #e5e5e5; /* Цвет фона выключенного состояния */
-    position: relative; /* Для позиционирования внутреннего круга */
-    border-radius: 20px; /* Скругление углов переключателя */
-    transition: all 0.3s ease; /* Плавный переход цвета фона */
-}
-
-.switch-btn::before {
-    content: "";
-    position: absolute;
-    height: 13px; /* Высота внутреннего круга */
-    width: 13px; /* Ширина внутреннего круга */
-    background: #8599b1; /* Цвет внутреннего круга */
-    border-radius: 50%; /* Скругление углов внутреннего круга */
-    transition: transform 0.3s ease; /* Плавный переход движения круга */
-    top: 2px;
-    bottom: 2px;
-    left: 2.5px;
-}
 
 /* Позиционирование внутреннего круга при включении переключателя */
 input[type="checkbox"]:checked + .switch-btn::before {
@@ -681,17 +619,17 @@ input[type="checkbox"]:checked + .switch-btn::before {
             }
         }
     }
+    .screener {
+        h1 {
+            font-size: rem(24px);
+        }
+    }
 }
 @media only screen and (max-width: 1400px) {
     .table {
         td,
         th {
             font-size: rem(14px);
-        }
-    }
-    .screener {
-        h1 {
-            font-size: rem(24px);
         }
     }
 }
