@@ -19,6 +19,12 @@
     padding: 16px 24px;
     flex: 1 1 100%;
 }
+.popup-btns {
+    display: flex;
+    gap: 20px;
+    max-width: fit-content;
+    margin-left: auto;
+}
 .popup-close {
     border-radius: 29px;
     background: #fff;
@@ -32,22 +38,33 @@
         }
     }
 }
-
+.popup-fullscreen {
+    border-radius: 29px;
+    background: #fff;
+    padding: 8px;
+    margin-left: auto;
+    margin-bottom: 16px;
+    cursor: pointer;
+    & svg {
+        & path {
+            stroke: #8599b1;
+            fill: #8599b1;
+        }
+    }
+}
 .popup-title {
     font-size: 24px;
     margin-bottom: 28px;
     font-weight: 700;
 }
+
 @media only screen and (max-width: 992px) {
     .popup-content {
         max-width: 100%;
         padding-top: 40px;
     }
     .popup-close {
-        position: absolute;
-        max-width: fit-content;
-        right: 40px;
-        top: 60px;
+        position: static;
     }
     .popup-content {
         .bond {

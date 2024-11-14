@@ -13,8 +13,6 @@ import ErrorPage from "./Components/Common/Error";
 import Bond from "./Components/Bond/Bond";
 import Screener from "./Components/Screener/Screener";
 
-// import getBond from "./RoutsActions/getBond";
-
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,12 +20,15 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        // loader: getBond,
-        path: "bond/",
+        path: "bond/:isinUrl",
         element: <Bond />,
+        loader: async ({ params }) => {
+          // Здесь вы можете использовать bondId для загрузки данных, если это необходимо
+          const { isinUrl } = params;
+          return isinUrl; // Возвращаем bondId, если нужно
+        },
       },
       {
-        // loader: getBond,
         path: "screener/",
         element: <Screener />,
       },

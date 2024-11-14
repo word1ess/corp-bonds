@@ -3,7 +3,7 @@ import BondLink from "./BondLink";
 export default function BondLinks({ bondLinks, linkImg }) {
   return (
     <section className="bond-links">
-      {bondLinks.map((bondLinkBlock) => {
+      {bondLinks?.map((bondLinkBlock) => {
         return (
           <BondLink
             title={bondLinkBlock.title}

@@ -1,11 +1,11 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { produce } from "immer";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { bondsApi } from "../api/api";
 import imgBond from "../Components/Screener/ScreenerTable/img/1.png";
 const initialState = {
   bonds: {
     bondHeader: {
       fullName: "МВ ФИНАНС 001Р-04",
-      isin: "RU000A106540",
+      isin: "RU000A106541",
       issuer: {
         id: 279,
         name: "МВ Финанс",
@@ -110,8 +110,8 @@ const initialState = {
         ],
       },
     ],
-    bondTables: [
-      {
+    bondTables: {
+      pay: {
         title: "Выплаты по облигации",
         header: [
           "Вид выплаты",
@@ -120,40 +120,20 @@ const initialState = {
           "% выплаты",
           "Остаток номинала после выплаты, руб",
         ],
-        body: [
-          ["Купон", "18.10.2024", "32.54", "13.05%", "13.05"],
-          ["Купон", "18.10.2024", "32.54", "13.05%", "13.05"],
-        ],
+        body: [],
         mobile: {
           header: ["Дата", "Выплаты, руб", "Выплаты, %"],
-          body: [
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-            [["18.10.2024", "Купон"], "2.54", "13.05%"],
-          ],
+          body: [],
         },
         maxCountOnce: 20,
       },
-      {
+      actions: {
         title: "Корпоративные действия",
         header: ["Дата", "Тип действия", "Срок подачи с", "Срок подачи до"],
-        body: [
-          ["18.10.2024", "put-оферта", "18.10.2024", "18.10.2024"],
-          ["18.10.2024", "put-оферта", "18.10.2024", "18.10.2024"],
-        ],
+        body: [],
         maxCountOnce: 20,
       },
-    ],
+    },
     bondLinks: [
       {
         title: "Обзоры эмитента",
@@ -194,6 +174,8 @@ const initialState = {
         ],
       },
     ],
+    status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
+    error: null,
   },
 
   bondReactTables: [
@@ -274,56 +256,89 @@ const initialState = {
   ],
 };
 
+export const fetchBondData = createAsyncThunk(
+  "bond/fetchBondData",
+  async (isin) => {
+    const response = await bondsApi.getBondsInfo(isin);
+    return response;
+  }
+);
+
+const formatDate = (date) => {
+  return date.split("-").reverse().join(".");
+};
+const transformPayment = (payment, mobile = false) => {
+  const date = formatDate(payment.date);
+  if (mobile) {
+    return [[date, payment.type], payment.amount, payment.percent + "%"];
+  }
+  return [
+    payment.type,
+    date,
+    payment.amount,
+    payment.percent + "%",
+    payment.remaining,
+  ];
+};
+const transformAction = (action) => {
+  return [
+    formatDate(action.date),
+    action.type,
+    formatDate(action.start),
+    formatDate(action.end),
+  ];
+};
+
 export const bondsSlice = createSlice({
   name: "bond",
   initialState,
   reducers: {
     setBondHeader: (state, action) => {
-      //  Обновите  `bondHeader`  в  найденном  объекте
       state.bonds.bondHeader = action.payload;
     },
     setBondPay: (state, action) => {
-      return produce(state, (draft) => {
-        draft.bondTables = action.payload.map((payment) => ({
-          body: [
-            [
-              payment.type,
-              payment.date.split("-").reverse().join("."), // Преобразуем дату в нужный формат
-              payment.amount,
-              payment.percent + "%",
-              payment.remaining,
-            ],
-          ],
-          mobile: {
-            body: [
-              [
-                [
-                  payment.date.split("-").reverse().join("."), // Преобразуем дату в нужный формат
-                  payment.type,
-                ],
-                payment.amount,
-                payment.percent + "%",
-              ],
-            ],
-          },
-        }));
-      });
+      state.bonds.bondTables.pay.body = action.payload.map((payment) =>
+        transformPayment(payment)
+      );
+      state.bonds.bondTables.pay.mobile.body = action.payload.map((payment) =>
+        transformPayment(payment, true)
+      );
     },
-    // setBondActions: (state, action) => {
-    //   return produce(state, (draft) => {
-    //     draft.bondTables[1] = action.payload.map((actionItem) => ({
-    //       body: [
-    //         [
-    //           actionItem.date.split("-").reverse().join("."), // Преобразуем дату в нужный формат
-    //           actionItem.type,
-    //           actionItem.start.split("-").reverse().join("."),
-    //           actionItem.end.split("-").reverse().join("."),
-    //         ],
-    //       ],
-    //       //  Удаляем  mobile
-    //     }));
-    //   });
-    // },
+    setBondActions: (state, action) => {
+      state.bonds.bondTables.actions.body = action.payload.map(transformAction);
+    },
+
+    setBondInfo(state, action) {
+      state.bonds.bondInfo = action.payload;
+    },
+    setBondLinks(state, action) {
+      state.bonds.bondLinks = action.payload;
+    },
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(fetchBondData.pending, (state) => {
+        state.status = "loading";
+        state.error = null; // Сбрасываем ошибку при новом запросе
+      })
+      .addCase(fetchBondData.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        const { bondHeader, bondTables } = action.payload;
+
+        // Обновляем состояние с учетом новых данных
+        if (bondHeader) state.bonds.bondHeader = bondHeader;
+        if (bondTables.pay) state.bonds.bondTables.pay.body = bondTables.pay;
+        if (bondTables.actions)
+          state.bonds.bondTables.actions.body = bondTables.actions;
+        if (action.payload.bondInfo)
+          state.bonds.bondInfo = action.payload.bondInfo;
+        if (action.payload.bondLinks)
+          state.bonds.bondLinks = action.payload.bondLinks;
+      })
+      .addCase(fetchBondData.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message; // Более подробная информация об ошибке
+      });
   },
 });
 

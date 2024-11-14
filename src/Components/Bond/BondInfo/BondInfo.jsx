@@ -3,7 +3,7 @@ import BondInfoItem from ".//BondInfoItem";
 export default function BondInfo({ bondInfoItems, linkImg }) {
   return (
     <main className="bond-info">
-      {bondInfoItems.map((item) => {
+      {bondInfoItems?.map((item) => {
         return (
           <BondInfoItem
             title={item.title}

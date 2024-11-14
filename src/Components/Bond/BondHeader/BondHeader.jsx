@@ -40,7 +40,7 @@ export default function BondHeader({ bondHeader, isMobile }) {
               })}
             </div>
             <CustomTooltip parent="liquidity" place="top" />
-            <p>({bondHeader.liquidity.liquidityQuantity} руб / день) </p>
+            <p>({bondHeader.liquidityQuantity} руб / день) </p>
           </div>
         </>
       );

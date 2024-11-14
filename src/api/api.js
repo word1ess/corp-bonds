@@ -3,49 +3,43 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-const url = "http://tst.corpbonds.ru/bond/";
+const url = "https://cors-anywhere.herokuapp.com/http://tst.corpbonds.ru/bond/";
 
 export const bondsApi = {
   async getBondsInfo(isin) {
-    let data = {};
+    const fetchWithErrorHandling = async (url) => {
+      const response = await fetch(url, { headers });
+      if (!response.ok) {
+        throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
+      }
+      return response.json();
+    };
+
     try {
-      const responseHeader = await fetch(`${url}${isin}`, {
-        headers,
-      });
-      if (!responseHeader.ok) {
-        throw new Error(
-          `Ошибка ${responseHeader.status}: ${responseHeader.statusText}`
-        );
-      }
+      const bondHeaderPromise = fetchWithErrorHandling(`${url}${isin}`);
+      const bondPayPromise = fetchWithErrorHandling(`${url}${isin}/pay`);
+      const bondActionPromise = fetchWithErrorHandling(`${url}${isin}/action`);
 
-      const responsePay = await fetch(`${url}${isin}/pay`, {
-        headers,
-      });
-      if (!responsePay.ok) {
-        throw new Error(
-          `Ошибка ${responseHeader.status}: ${responseHeader.statusText}`
-        );
-      }
+      // Выполняем запросы параллельно
+      const [bondHeader, bondPay, bondAction] = await Promise.all([
+        bondHeaderPromise,
+        bondPayPromise,
+        bondActionPromise,
+      ]);
 
-      const responseAction = await fetch(`${url}${isin}/action`, {
-        headers,
-      });
-      if (!responseAction.ok) {
-        throw new Error(
-          `Ошибка ${responseHeader.status}: ${responseHeader.statusText}`
-        );
-      }
-
-      const bondHeader = await responseHeader.json(); // Получаем данные в формате JSON
-      const bondPay = await responsePay.json(); // Получаем данные в формате JSON
-      const bondAction = await responseAction.json(); // Получаем данные в формате JSON
-      data = { bondHeader, bondPay, bondAction };
-      return data;
+      // Возвращаем данные в требуемой структуре
+      return {
+        bondHeader,
+        bondTables: {
+          pay: { body: bondPay },
+          actions: { body: bondAction },
+        },
+      };
     } catch (error) {
-      //  Выводим  подробную  информацию  о  ошибке
+      // Выводим подробную информацию о ошибке
       console.error("Ошибка при получении данных облигации:", error);
-      console.error("Дополнительная информация:", error.message); //  Выводим  сообщение  ошибки
-      throw error;
+      console.error("Дополнительная информация:", error.message);
+      throw error; // Перебрасываем ошибку дальше
     }
   },
 };

@@ -7,7 +7,7 @@ import React, {
   useEffect,
 } from "react";
 import { useOutletContext } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useTable, useSortBy } from "react-table";
 import { useSticky } from "react-table-sticky";
 import { MultiSelect } from "react-multi-select-component";
@@ -15,13 +15,6 @@ import { MultiSelect } from "react-multi-select-component";
 import Bond from "../../Bond/Bond";
 import CustomTooltip from "../../Common/CustomTooltip/CustomTooltip";
 import PopupLayout from "../../Common/PopupLayout/PopupLayout";
-
-import { bondsApi } from "../../../api/api";
-import {
-  setBondHeader,
-  setBondPay,
-  setBondActions,
-} from "../../../redux/bonds";
 
 // Редюсер для управления состоянием фильтров
 const filterReducer = (state, action) => {
@@ -151,7 +144,26 @@ const RatingTable = ({
     setIsOpen((prev) => !prev);
   };
   const ratingAgencies = ["AKPA", "Эксперт PA", "HPA", "HKP"];
-  const ratings = ["AA-", "A+", "A", "A-", "BB+"]; // Все 5 рейтингов
+  const ratings = [
+    "AAA",
+    "AA+",
+    "AA",
+    "AA-",
+    "A+",
+    "A",
+    "A-",
+    "BBB+",
+    "BBB",
+    "BBB-",
+    "BB+",
+    "BB",
+    "BB-",
+    "B+",
+    "B",
+    "B-",
+    "CCC",
+    "Нет",
+  ]; // Все 5 рейтингов
 
   // Данные для таблицы
   const data = useMemo(() => {
@@ -266,44 +278,48 @@ const RatingTable = ({
             Нажмите <button className="switch-btn"></button>, чтобы выбрать все
             значения в строке ( рейтинг у всех агентств)
           </header>
-          <table {...getTableProps()}>
-            <thead>
-              {headerGroups.map((headerGroup) => (
-                <tr {...headerGroup.getHeaderGroupProps()}>
-                  {headerGroup.headers.map((column) => (
-                    <th {...column.getHeaderProps()}>
-                      {column.render("Header")}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-              {rows.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr {...row.getRowProps()}>
-                    {row.cells.map((cell) => (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+          <div className="range-dropdown-filter__table-row">
+            <table {...getTableProps()}>
+              <thead>
+                {headerGroups.map((headerGroup) => (
+                  <tr {...headerGroup.getHeaderGroupProps()}>
+                    {headerGroup.headers.map((column) => (
+                      <th {...column.getHeaderProps()}>
+                        {column.render("Header")}
+                      </th>
                     ))}
                   </tr>
-                );
-              })}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={columns.length} style={{ textAlign: "center" }}>
-                    Нет данных для отображения
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                ))}
+              </thead>
+              <tbody {...getTableBodyProps()}>
+                {rows.map((row) => {
+                  prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()}>
+                      {row.cells.map((cell) => (
+                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      ))}
+                    </tr>
+                  );
+                })}
+                {rows.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      style={{ textAlign: "center" }}
+                    >
+                      Нет данных для отображения
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
   );
 };
-
 // Блок фильтров
 const ScreenerBlockFilters = ({
   filters,
@@ -342,7 +358,6 @@ const ScreenerBlockFilters = ({
     setIsOpen(false);
     document.querySelector(".header").classList.remove("popup-open");
   };
-
   // Уникальные значения для фильтров
   const uniqueValues = (key) => [...new Set(data.map((item) => item[key]))];
   const handleApplyFilters = () => {
@@ -477,138 +492,6 @@ const ScreenerBlockFilters = ({
             })
           }
         />
-        <RangeDropdownFilter
-          label="Дневной оборот"
-          minValue={filters.mSpread.min}
-          maxValue={filters.mSpread.max}
-          onMinChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "mSpread",
-              value: { ...filters.mSpread, min: value },
-            })
-          }
-          onMaxChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "mSpread",
-              value: { ...filters.mSpread, max: value },
-            })
-          }
-        />
-        <RangeDropdownFilter
-          label="Уровень листинга"
-          minValue={filters.listingLevel.min}
-          maxValue={filters.listingLevel.max}
-          onMinChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "listingLevel",
-              value: { ...filters.listingLevel, min: value },
-            })
-          }
-          onMaxChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "listingLevel",
-              value: { ...filters.listingLevel, max: value },
-            })
-          }
-        />
-        <RangeDropdownFilter
-          label="Уровень ликвидности"
-          minValue={filters.liquidityLevel.min}
-          maxValue={filters.liquidityLevel.max}
-          onMinChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "liquidityLevel",
-              value: { ...filters.liquidityLevel, min: value },
-            })
-          }
-          onMaxChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "liquidityLevel",
-              value: { ...filters.liquidityLevel, max: value },
-            })
-          }
-        />
-        <RangeDropdownFilter
-          label="Объем в текущую сессию"
-          minValue={filters.tradingVolumeSession.min}
-          maxValue={filters.tradingVolumeSession.max}
-          onMinChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "tradingVolumeSession",
-              value: { ...filters.tradingVolumeSession, min: value },
-            })
-          }
-          onMaxChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "tradingVolumeSession",
-              value: { ...filters.tradingVolumeSession, max: value },
-            })
-          }
-        />
-        <RangeDropdownFilter
-          label="Изменение цены к вчера"
-          minValue={filters.changePriceToTommorow.min}
-          maxValue={filters.changePriceToTommorow.max}
-          onMinChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "changePriceToTommorow",
-              value: { ...filters.changePriceToTommorow, min: value },
-            })
-          }
-          onMaxChange={(value) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "changePriceToTommorow",
-              value: { ...filters.changePriceToTommorow, max: value },
-            })
-          }
-        />
-
-        <MultiSelectFilter
-          label="Валюта"
-          options={uniqueValues("currency")}
-          selectedValues={filters.currency}
-          onChange={(selected) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "currency",
-              value: selected,
-            })
-          }
-        />
-        <MultiSelectFilter
-          label="Отрасль"
-          options={uniqueValues("branch")}
-          selectedValues={filters.branch}
-          onChange={(selected) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "branch",
-              value: selected,
-            })
-          }
-        />
-        <MultiSelectFilter
-          label="Ограничения"
-          options={uniqueValues("qualifiedOnlyFlag")}
-          selectedValues={filters.qualifiedOnlyFlag}
-          onChange={(selected) =>
-            setFilters({
-              type: "SET_FILTER",
-              filter: "qualifiedOnlyFlag",
-              value: selected,
-            })
-          }
-        />
 
         {isOpenFilters && (
           <>
@@ -632,7 +515,6 @@ const ScreenerBlockFilters = ({
                 })
               }
             />
-
             <RangeDropdownFilter
               label="Частота купона"
               minValue={filters.couponFrequency.min}
@@ -650,6 +532,149 @@ const ScreenerBlockFilters = ({
                   type: "SET_FILTER",
                   filter: "couponFrequency",
                   value: { ...filters.couponFrequency, max: value },
+                })
+              }
+            />
+            <RangeDropdownFilter
+              label="Дневной оборот"
+              minValue={filters.mSpread.min}
+              maxValue={filters.mSpread.max}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "mSpread",
+                  value: { ...filters.mSpread, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "mSpread",
+                  value: { ...filters.mSpread, max: value },
+                })
+              }
+            />
+            <RangeDropdownFilter
+              label="Уровень листинга"
+              minValue={filters.listingLevel.min}
+              maxValue={filters.listingLevel.max}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "listingLevel",
+                  value: { ...filters.listingLevel, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "listingLevel",
+                  value: { ...filters.listingLevel, max: value },
+                })
+              }
+            />
+            <RangeDropdownFilter
+              label="Уровень ликвидности"
+              minValue={filters.liquidityLevel.min}
+              maxValue={filters.liquidityLevel.max}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "liquidityLevel",
+                  value: { ...filters.liquidityLevel, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "liquidityLevel",
+                  value: { ...filters.liquidityLevel, max: value },
+                })
+              }
+            />
+            <RangeDropdownFilter
+              label="Объем в текущую сессию"
+              minValue={filters.tradingVolumeSession.min}
+              maxValue={filters.tradingVolumeSession.max}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "tradingVolumeSession",
+                  value: { ...filters.tradingVolumeSession, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "tradingVolumeSession",
+                  value: { ...filters.tradingVolumeSession, max: value },
+                })
+              }
+            />
+            <RangeDropdownFilter
+              label="Изменение цены к вчера"
+              minValue={filters.changePriceToTommorow.min}
+              maxValue={filters.changePriceToTommorow.max}
+              onMinChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "changePriceToTommorow",
+                  value: { ...filters.changePriceToTommorow, min: value },
+                })
+              }
+              onMaxChange={(value) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "changePriceToTommorow",
+                  value: { ...filters.changePriceToTommorow, max: value },
+                })
+              }
+            />
+            <MultiSelectFilter
+              label="Валюта"
+              options={uniqueValues("currency")}
+              selectedValues={filters.currency}
+              onChange={(selected) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "currency",
+                  value: selected,
+                })
+              }
+            />
+            <MultiSelectFilter
+              label="Амортизация"
+              options={uniqueValues("amortization")}
+              selectedValues={filters.amortization}
+              onChange={(selected) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "amortization",
+                  value: selected,
+                })
+              }
+            />
+            <MultiSelectFilter
+              label="Отрасль"
+              options={uniqueValues("branch")}
+              selectedValues={filters.branch}
+              onChange={(selected) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "branch",
+                  value: selected,
+                })
+              }
+            />
+            <MultiSelectFilter
+              label="Ограничения"
+              options={uniqueValues("qualifiedOnlyFlag")}
+              selectedValues={filters.qualifiedOnlyFlag}
+              onChange={(selected) =>
+                setFilters({
+                  type: "SET_FILTER",
+                  filter: "qualifiedOnlyFlag",
+                  value: selected,
                 })
               }
             />
@@ -920,12 +945,13 @@ const ScreenerBlockFilters = ({
                 }
               />
             </div>
+            <ScreenerBlockBtns />
           </PopupLayout>
         )}
       </>
     );
   };
-  const ScreenerBlockSearch = ({}) => {
+  const ScreenerBlockSearch = ({ isPopupOpen }) => {
     const [localSearchTerm, setLocalSearchTerm] = useState("");
     const [isFocused, setIsFocused] = useState(false);
 
@@ -980,7 +1006,7 @@ const ScreenerBlockFilters = ({
     };
 
     return (
-      <div className="search">
+      <div className={`${isPopupOpen ? "popup-open" : ""} search`}>
         <input
           type="text"
           placeholder="Поиск по названию или ISIN"
@@ -988,8 +1014,30 @@ const ScreenerBlockFilters = ({
           ref={inputRef}
           value={localSearchTerm}
         />
-        <button onClick={(e) => setSearchTerm(inputRef.current.value)}>
-          Искать
+        <button
+          className="search__btn"
+          onClick={(e) => setSearchTerm(inputRef.current.value)}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9.58334 17.4993C13.9556 17.4993 17.5 13.9549 17.5 9.58268C17.5 5.21043 13.9556 1.66602 9.58334 1.66602C5.21108 1.66602 1.66667 5.21043 1.66667 9.58268C1.66667 13.9549 5.21108 17.4993 9.58334 17.4993Z"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M18.3333 18.3327L16.6667 16.666"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
         {isFocused && filteredSuggestionsRef.current.length > 0 && (
           <ul className="search__tip">
@@ -1008,10 +1056,70 @@ const ScreenerBlockFilters = ({
       </div>
     );
   };
+  const ScreenerBlockBtns = ({}) => {
+    return (
+      <div className="screener__filter-btns">
+        <p className="screener__total">Реузльтаты поиска: {data.length}</p>
+        <button onClick={handleApplyFilters} className="screener__done">
+          <svg
+            width="21"
+            height="20"
+            viewBox="0 0 21 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5.00032 1.75H16.0003C16.917 1.75 17.667 2.5 17.667 3.41667V5.25C17.667 5.91667 17.2503 6.75 16.8336 7.16667L13.2503 10.3333C12.7503 10.75 12.417 11.5833 12.417 12.25V15.8333C12.417 16.3333 12.0836 17 11.667 17.25L10.5003 18C9.41698 18.6667 7.91698 17.9167 7.91698 16.5833V12.1667C7.91698 11.5833 7.58365 10.8333 7.25032 10.4167L4.08365 7.08333C3.66698 6.66667 3.33365 5.91667 3.33365 5.41667V3.5C3.33365 2.5 4.08365 1.75 5.00032 1.75Z"
+              stroke="#F5F8F9"
+              stroke-width="1.5"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M9.60833 1.75L5.5 8.33333"
+              stroke="#F5F8F9"
+              stroke-width="1.5"
+              stroke-miterlimit="10"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Применить фильтры
+        </button>
+        <button onClick={handleResetFilters} className="screener__reset">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.125 18.0577C15.7 17.116 18.3333 13.866 18.3333 9.99935C18.3333 5.39935 14.6333 1.66602 9.99999 1.66602C4.44166 1.66602 1.66666 6.29935 1.66666 6.29935M1.66666 6.29935V2.49935M1.66666 6.29935H3.34166H5.36666"
+              stroke="#3A65B5"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M1.66666 10C1.66666 14.6 5.39999 18.3333 9.99999 18.3333"
+              stroke="#3A65B5"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-dasharray="3 3"
+            />
+          </svg>
+          Сбросить фильтры
+        </button>
+      </div>
+    );
+  };
 
   return (
     <header className="screener__block">
-      <ScreenerBlockSearch />
+      <ScreenerBlockSearch isPopupOpen={isPopupOpen} />
       <div className="screener__filters">
         <div className="screener__filters-row">
           {isMobile ? (
@@ -1020,66 +1128,11 @@ const ScreenerBlockFilters = ({
             <ScreenerBlockFiltersPC />
           )}
         </div>
-        <div className="screener__filter-btns">
-          <button onClick={handleApplyFilters} className="screener__done">
-            <svg
-              width="21"
-              height="20"
-              viewBox="0 0 21 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5.00032 1.75H16.0003C16.917 1.75 17.667 2.5 17.667 3.41667V5.25C17.667 5.91667 17.2503 6.75 16.8336 7.16667L13.2503 10.3333C12.7503 10.75 12.417 11.5833 12.417 12.25V15.8333C12.417 16.3333 12.0836 17 11.667 17.25L10.5003 18C9.41698 18.6667 7.91698 17.9167 7.91698 16.5833V12.1667C7.91698 11.5833 7.58365 10.8333 7.25032 10.4167L4.08365 7.08333C3.66698 6.66667 3.33365 5.91667 3.33365 5.41667V3.5C3.33365 2.5 4.08365 1.75 5.00032 1.75Z"
-                stroke="#F5F8F9"
-                stroke-width="1.5"
-                stroke-miterlimit="10"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M9.60833 1.75L5.5 8.33333"
-                stroke="#F5F8F9"
-                stroke-width="1.5"
-                stroke-miterlimit="10"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            Применить фильтры
-          </button>
-          <button onClick={handleResetFilters} className="screener__reset">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12.125 18.0577C15.7 17.116 18.3333 13.866 18.3333 9.99935C18.3333 5.39935 14.6333 1.66602 9.99999 1.66602C4.44166 1.66602 1.66666 6.29935 1.66666 6.29935M1.66666 6.29935V2.49935M1.66666 6.29935H3.34166H5.36666"
-                stroke="#3A65B5"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M1.66666 10C1.66666 14.6 5.39999 18.3333 9.99999 18.3333"
-                stroke="#3A65B5"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-dasharray="3 3"
-              />
-            </svg>
-            Сбросить фильтры
-          </button>
-        </div>
+        <ScreenerBlockBtns />
       </div>
     </header>
   );
 };
-
 // Таблица
 const DataTable = ({ data, columns, onRowClick }) => {
   // Настройка таблицы с использованием react-table
@@ -1285,7 +1338,6 @@ const DataTable = ({ data, columns, onRowClick }) => {
 // Вся логика для таблицы
 const TableComponent = () => {
   const isMobile = useOutletContext();
-  const dispatchRedux = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
 
   // Состояние для выбранных рейтингов
@@ -1329,6 +1381,7 @@ const TableComponent = () => {
     branch: [],
     changePriceToTommorow: { min: "", max: "" },
     listingLevel: { min: "", max: "" },
+    amortization: [],
   };
   // Состояние для примененных фильтров
   const [appliedFilters, setAppliedFilters] = useState(initialFilters);
@@ -1437,18 +1490,11 @@ const TableComponent = () => {
   };
 
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isin, setIsin] = useState(false);
   // Открытие попапа
-  const handleRowClick = async (isin) => {
-    try {
-      const data = await bondsApi.getBondsInfo(isin);
-      dispatchRedux(setBondHeader(data.bondHeader));
-      dispatchRedux(setBondPay(data.bondPay));
-      // dispatchRedux(setBondActions(data.bondActions));
-
-      setIsPopupOpen(true);
-    } catch (err) {
-      console.log(err.message || "Ошибка при загрузке данных");
-    }
+  const handleRowClick = (isin) => {
+    setIsPopupOpen(true);
+    setIsin(isin);
   };
   // Закрытие попапа
   const handleCloseClick = () => {
@@ -1670,6 +1716,25 @@ const TableComponent = () => {
       gSpread: true,
     });
   };
+  const settingsBlock = useRef(null);
+
+  // Эффект для закрытия дропдауна при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        settingsBlock.current &&
+        !settingsBlock.current.contains(event.target)
+      ) {
+        setShowSettings(false); // Закрываем дропдаун
+      }
+    };
+    // Добавляем обработчик события клика
+    document.addEventListener("mousedown", handleClickOutside);
+    // Убираем обработчик при размонтировании компонента
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
@@ -1775,7 +1840,10 @@ const TableComponent = () => {
           </svg>
         </button>
         {showSettings && (
-          <div className="screener__toggle-columns screener__block">
+          <div
+            className="screener__toggle-columns screener__block"
+            ref={settingsBlock}
+          >
             <header className="screener__toggle-header">
               <h3>Настройки</h3>
               <button onClick={resetColumnVisibility}>По умолчанию</button>
@@ -1821,8 +1889,9 @@ const TableComponent = () => {
         <PopupLayout
           isPopupOpen={isPopupOpen}
           handleCloseClick={handleCloseClick}
+          isin={isin}
         >
-          <Bond />
+          <Bond isinFromPopup={isin} />
         </PopupLayout>
       )}
     </>

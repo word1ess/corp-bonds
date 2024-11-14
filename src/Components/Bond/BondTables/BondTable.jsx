@@ -43,19 +43,20 @@ export default function BondTable({
     return (
       <tbody>
         {isMobile
-          ? mobileBody.map((rowItem, i) => {
+          ? Array.from(mobileBody).map((rowItem, i) => {
               if (i < max) return <TableRowItem bodyArr={rowItem} />;
             })
-          : body.map((rowItem, i) => {
+          : Array.from(body).map((rowItem, i) => {
               if (i < max) return <TableRowItem bodyArr={rowItem} />;
             })}
       </tbody>
     );
   }
   function TableRowItem({ bodyArr }) {
+    const valuesArray = Object.values(bodyArr);
     return (
       <tr>
-        {bodyArr.map((bodyItem) => {
+        {Array.from(valuesArray).map((bodyItem) => {
           return <TableDataItem bodyItem={bodyItem} />;
         })}
       </tr>

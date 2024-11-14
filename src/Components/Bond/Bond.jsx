@@ -1,18 +1,23 @@
 import "./Bond.scss";
 
-// import { useLoaderData } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { useOutletContext } from "react-router-dom";
+import { useBondData } from "../../hooks/useBondData";
+import { useOutletContext, useParams } from "react-router-dom";
 
 import BondHeader from "./BondHeader/BondHeader";
 import BondInfo from "./BondInfo/BondInfo";
 import BondTables from "./BondTables/BondTables";
 import BondChart from "./BondChart/BondChart";
 import BondLinks from "./BondLinks/BondLinks";
+import { useSelector } from "react-redux";
 
-export default function Bond() {
-  const isMobile = useOutletContext();
-  const bondData = useSelector((state) => state.bond.bonds);
+export default function Bond({ isinFromPopup }) {
+  const { isMobile } = useOutletContext();
+  const { isinUrl } = useParams();
+  const { loading, error, bondData } = useBondData(isinFromPopup || isinUrl);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!bondData) return <div>No data</div>;
 
   return (
     <section className="bond">

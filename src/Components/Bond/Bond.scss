@@ -767,19 +767,6 @@
         padding-top: 80px;
         overscroll-behavior: contain;
     }
-    .popup-close {
-        display: flex;
-        justify-content: flex-end;
-        align-items: flex-end;
-        position: fixed;
-        z-index: 4;
-        left: 15px;
-        right: 15px;
-        top: 15px;
-        box-shadow: 0 16px 34px 0 rgba(0, 0, 0, 0.05), 0 63px 63px 0 rgba(0, 0, 0, 0.05),
-            0 141px 85px 0 rgba(0, 0, 0, 0.05), 0 251px 100px 0 rgba(73, 181, 83, 0.01),
-            0 391px 110px 0 rgba(73, 181, 83, 0);
-    }
 }
 @media only screen and (max-width: 768px) {
 }
