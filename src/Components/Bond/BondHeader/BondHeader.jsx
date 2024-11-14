@@ -24,8 +24,8 @@ export default function BondHeader({ bondHeader, isMobile }) {
                 <p>Эмитент:</p>
 
                 <CustomLinkArrow
-                  text={bondHeader.issuerName}
-                  link={bondHeader.issuerLink}
+                  text={bondHeader.issuer.name}
+                  link={bondHeader.issuer.url}
                 />
               </div>
             </div>
@@ -57,8 +57,8 @@ export default function BondHeader({ bondHeader, isMobile }) {
             <p>Эмитент:</p>
 
             <CustomLinkArrow
-              text={bondHeader.issuerName}
-              link={bondHeader.issuerLink}
+              text={bondHeader.issuer.name}
+              link={bondHeader.issuer.url}
             />
           </div>
           <div className="bond-big-card__liquidity">
@@ -301,13 +301,17 @@ export default function BondHeader({ bondHeader, isMobile }) {
         />
         <BondCard
           title="М спред"
-          body={bondHeader.mSpread === null ? "-" : `${bondHeader.mSpread} %`}
-          isTextGreen={bondHeader.mSpread && true}
+          body={
+            bondHeader.mSpread === undefined ? "-" : `${bondHeader.mSpread} %`
+          }
+          isTextGreen={bondHeader.mSpread}
         />
         <BondCard
           title="G спред"
-          body={bondHeader.gSpread === null ? "-" : `${bondHeader.gSpread} %`}
-          isTextGreen={bondHeader.gSpread && true}
+          body={
+            bondHeader.gSpread === undefined ? "-" : `${bondHeader.gSpread} %`
+          }
+          isTextGreen={bondHeader.gSpread}
         />
         <BondCard
           title="Цена"

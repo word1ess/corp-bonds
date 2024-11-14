@@ -12,7 +12,7 @@ import BondLinks from "./BondLinks/BondLinks";
 
 export default function Bond() {
   const isMobile = useOutletContext();
-  const bondData = useSelector((state) => state.bond.bonds[0]);
+  const bondData = useSelector((state) => state.bond.bonds);
 
   return (
     <section className="bond">

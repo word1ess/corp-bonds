@@ -3,40 +3,33 @@ const headers = {
   "Content-Type": "application/json",
 };
 
+const url = "http://tst.corpbonds.ru/bond/";
+
 export const bondsApi = {
   async getBondsInfo(isin) {
     let data = {};
     try {
-      const responseHeader = await fetch(
-        `https://cors-anywhere.herokuapp.com/http://tst.corpbonds.ru/bond/${isin}`,
-        {
-          headers,
-        }
-      );
+      const responseHeader = await fetch(`${url}${isin}`, {
+        headers,
+      });
       if (!responseHeader.ok) {
         throw new Error(
           `Ошибка ${responseHeader.status}: ${responseHeader.statusText}`
         );
       }
 
-      const responsePay = await fetch(
-        `https://cors-anywhere.herokuapp.com/http://tst.corpbonds.ru/bond/${isin}/pay`,
-        {
-          headers,
-        }
-      );
+      const responsePay = await fetch(`${url}${isin}/pay`, {
+        headers,
+      });
       if (!responsePay.ok) {
         throw new Error(
           `Ошибка ${responseHeader.status}: ${responseHeader.statusText}`
         );
       }
 
-      const responseAction = await fetch(
-        `https://cors-anywhere.herokuapp.com/http://tst.corpbonds.ru/bond/${isin}/action`,
-        {
-          headers,
-        }
-      );
+      const responseAction = await fetch(`${url}${isin}/action`, {
+        headers,
+      });
       if (!responseAction.ok) {
         throw new Error(
           `Ошибка ${responseHeader.status}: ${responseHeader.statusText}`
